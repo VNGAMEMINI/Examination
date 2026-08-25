@@ -1,0 +1,59 @@
+1. Data
+   ↓
+2. Validator
+   ↓
+3. Normalizer
+   ↓
+4. Subject
+   ↓
+5. Question
+   ↓
+6. Answer
+   ↓
+7. Compare
+   ↓
+8. Type
+   ↓
+9. Examination
+   ↓
+10. Session
+
+
+                    ┌─────────────┐
+                    │    Data     │
+                    └──────┬──────┘
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+         Subject        Question       Settings
+             │             │
+             │             ▼
+             │           Answer
+             │             │
+             └──────┬──────┘
+                    ▼
+                  Types
+                    │
+                    ▼
+                 Compare
+                    │
+             ┌──────┴──────┐
+             ▼             ▼
+           Score          Time
+             │             │
+             └──────┬──────┘
+                    ▼
+                 Session
+                    │
+                    ▼
+                  Result
+                    │
+                    ▼
+              Examination
+                    │
+                    │ API
+                    ▼
+                  Check
+                    │
+                    ▼
+                 Web UI

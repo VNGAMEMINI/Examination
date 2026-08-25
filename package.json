@@ -1,0 +1,14 @@
+{
+  "name": "@vngamemini/examination",
+  "version": "0.1.0",
+  "description": "Data processing engine for web examinations",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
