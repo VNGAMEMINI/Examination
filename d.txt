@@ -1,59 +1,56 @@
-1. Data
-   ↓
-2. Validator
-   ↓
-3. Normalizer
-   ↓
-4. Subject
-   ↓
-5. Question
-   ↓
-6. Answer
-   ↓
-7. Compare
-   ↓
-8. Type
-   ↓
-9. Examination
-   ↓
-10. Session
+01. Package Setup
+        ↓
+02. Data Model
+        ↓
+03. Normalizer
+        ↓
+04. Validator
+        ↓
+05. Question
+        ↓
+06. Answer
+        ↓
+07. Compare
+        ↓
+08. Question Types
+        ↓
+09. Session
+        ↓
+10. State
+        ↓
+11. Navigation
+        ↓
+12. Time
+        ↓
+13. Random
+        ↓
+14. Score
+        ↓
+15. Result
+        ↓
+16. Policy
+        ↓
+17. Events
+        ↓
+18. Public API
+        ↓
+19. Tests
+        ↓
+20. Check Integration
 
-
-                    ┌─────────────┐
-                    │    Data     │
-                    └──────┬──────┘
-                           │
-             ┌─────────────┼─────────────┐
-             ▼             ▼             ▼
-         Subject        Question       Settings
-             │             │
-             │             ▼
-             │           Answer
-             │             │
-             └──────┬──────┘
-                    ▼
-                  Types
-                    │
-                    ▼
-                 Compare
-                    │
-             ┌──────┴──────┐
-             ▼             ▼
-           Score          Time
-             │             │
-             └──────┬──────┘
-                    ▼
-                 Session
-                    │
-                    ▼
-                  Result
-                    │
-                    ▼
-              Examination
-                    │
-                    │ API
-                    ▼
-                  Check
-                    │
-                    ▼
-                 Web UI
+Examination
+│
+├── Data
+├── Normalizer
+├── Validator
+├── Question
+├── Answer
+├── Compare
+├── Session
+├── State
+├── Navigation
+├── Time
+├── Random
+├── Score
+├── Result
+└── Policy
