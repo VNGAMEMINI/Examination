@@ -50,7 +50,7 @@ function createSubject() {
 test("valid Subject should pass", () => {
   const subject = new Subject({
     id: "s1",
-    name: "",
+    name: "Mathematics",
     questions: new QuestionCollection([createQuestion("q1")]),
   });
 
@@ -75,9 +75,11 @@ test("should reject non-Subject", () => {
 });
 
 test("should reject empty subject name", () => {
-  const subject = createSubject();
-
-  subject.name = "";
+  const subject = new Subject({
+    id: "s1",
+    name: "",
+    questions: new QuestionCollection([createQuestion("q1")]),
+  });
 
   assert.throws(
     () => {
@@ -108,15 +110,28 @@ test("should reject non-string subject name", () => {
 });
 
 test("should validate questions", () => {
+  const question = new Question({
+    id: "q1",
+    text: "",
+    answers: new AnswerCollection([
+      new Answer({
+        value: "A",
+        correct: false,
+        index: 0,
+      }),
+      new Answer({
+        value: "B",
+        correct: true,
+        index: 1,
+      }),
+    ]),
+  });
+
   const subject = new Subject({
     id: "s1",
     name: "Mathematics",
-    questions: new QuestionCollection(),
+    questions: new QuestionCollection([question]),
   });
-
-  const question = subject.questions.get(0);
-
-  question.text = "";
 
   assert.throws(
     () => {
@@ -133,9 +148,11 @@ test("should validate questions", () => {
 });
 
 test("should reject empty question collection", () => {
-  const subject = createSubject();
-
-  subject.questions = new QuestionCollection();
+  const subject = new Subject({
+    id: "s1",
+    name: "Mathematics",
+    questions: new QuestionCollection(),
+  });
 
   assert.throws(
     () => {

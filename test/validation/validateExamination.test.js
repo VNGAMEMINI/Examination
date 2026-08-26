@@ -109,10 +109,9 @@ test("should reject non-Examination", () => {
 
 test("should validate SubjectCollection", () => {
   const examination =
-    createExamination();
-
-  examination.subjects =
-    new SubjectCollection();
+    new Examination({
+      subjects: new SubjectCollection()
+    });
 
   assert.throws(
     () => {
@@ -140,18 +139,21 @@ test("should validate SubjectCollection", () => {
 
 
 test("should validate Subject", () => {
-  const examination =
-    createExamination();
-
   const subject =
-    createSubject("s1");
+    new Subject({
+      id: "s1",
+      name: "",
+      questions: new QuestionCollection([
+        createQuestion("q1")
+      ])
+    });
 
-  subject.name = "";
-
-  examination.subjects =
-    new SubjectCollection([
-      subject
-    ]);
+  const examination =
+    new Examination({
+      subjects: new SubjectCollection([
+        subject
+      ])
+    });
 
   assert.throws(
     () => {
@@ -174,13 +176,12 @@ test("should validate Subject", () => {
 
 
 test("should validate Question", () => {
-  const examination =
-    createExamination();
-
   const question =
-    createQuestion("q1");
-
-  question.text = "";
+    new Question({
+      id: "q1",
+      text: "",
+      answers: createAnswerCollection()
+    });
 
   const subject =
     new Subject({
@@ -191,10 +192,12 @@ test("should validate Question", () => {
       ])
     });
 
-  examination.subjects =
-    new SubjectCollection([
-      subject
-    ]);
+  const examination =
+    new Examination({
+      subjects: new SubjectCollection([
+        subject
+      ])
+    });
 
   assert.throws(
     () => {
@@ -217,9 +220,6 @@ test("should validate Question", () => {
 
 
 test("should validate AnswerCollection", () => {
-  const examination =
-    createExamination();
-
   const question =
     new Question({
       id: "q1",
@@ -248,10 +248,12 @@ test("should validate AnswerCollection", () => {
       ])
     });
 
-  examination.subjects =
-    new SubjectCollection([
-      subject
-    ]);
+  const examination =
+    new Examination({
+      subjects: new SubjectCollection([
+        subject
+      ])
+    });
 
   assert.throws(
     () => {

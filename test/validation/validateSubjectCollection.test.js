@@ -117,7 +117,7 @@ test("should validate every Subject", () => {
   const valid =
   new Subject({
     id: "s1",
-    name: "",
+    name: "Mathematics",
     questions: new QuestionCollection([
       createQuestion("q1")
     ])
@@ -132,7 +132,6 @@ test("should validate every Subject", () => {
     ])
   });
 
-  invalid.name = "";
 
   const subjects = new SubjectCollection([
     valid,

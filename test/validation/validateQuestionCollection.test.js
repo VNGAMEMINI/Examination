@@ -11,6 +11,22 @@ import ValidationError from "../../src/validation/ValidationError.js";
 
 import validateQuestionCollection from "../../src/validation/validateQuestionCollection.js";
 
+function createAnswerCollection() {
+  return new AnswerCollection([
+    new Answer({
+      value: "A",
+      correct: false,
+      index: 0
+    }),
+
+    new Answer({
+      value: "B",
+      correct: true,
+      index: 1
+    })
+  ]);
+}
+
 function createQuestion(id = null) {
   const answers = new AnswerCollection([
     new Answer({
@@ -75,7 +91,7 @@ test("should reject empty collection", () => {
 });
 
 test("should validate every Question", () => {
-  const questions = new Question({
+  const question = new Question({
     id: "q1",
     text: "",
     answers: createAnswerCollection(),

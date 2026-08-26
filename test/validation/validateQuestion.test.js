@@ -9,6 +9,22 @@ import ValidationError from "../../src/validation/ValidationError.js";
 
 import validateQuestion from "../../src/validation/validateQuestion.js";
 
+function createAnswerCollection() {
+  return new AnswerCollection([
+    new Answer({
+      value: "A",
+      correct: false,
+      index: 0
+    }),
+
+    new Answer({
+      value: "B",
+      correct: true,
+      index: 1
+    })
+  ]);
+}
+
 function createQuestion() {
   const answers = new AnswerCollection([
     new Answer({
@@ -90,9 +106,10 @@ test("should reject non-string question text", () => {
 });
 
 test("should validate answers", () => {
-  const question = createQuestion();
-
-  question.answers = new AnswerCollection([
+  const question = new Question({
+    id: "q1",
+    text: "Which answer is correct?",
+    answers: new AnswerCollection([
     new Answer({
       value: "A",
       correct: false,
@@ -104,7 +121,8 @@ test("should validate answers", () => {
       correct: false,
       index: 1,
     }),
-  ]);
+  ]),
+  });
 
   assert.throws(
     () => {
