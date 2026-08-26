@@ -1,6 +1,6 @@
-import Answer from "./Answer.js";
+import Subject from "./Subject.js";
 
-class AnswerCollection {
+class SubjectCollection {
   #items = [];
 
   constructor(items = []) {
@@ -13,14 +13,16 @@ class AnswerCollection {
     return this.#items.length;
   }
 
-  add(answer) {
-    if (!(answer instanceof Answer)) {
-      throw new TypeError("AnswerCollection only accepts Answer instances");
+  add(subject) {
+    if (!(subject instanceof Subject)) {
+      throw new TypeError(
+        "SubjectCollection only accepts Subject instances"
+      );
     }
 
-    this.#items.push(answer);
+    this.#items.push(subject);
 
-    return answer;
+    return subject;
   }
 
   get(index) {
@@ -40,4 +42,4 @@ class AnswerCollection {
   }
 }
 
-export default AnswerCollection;
+export default SubjectCollection;
