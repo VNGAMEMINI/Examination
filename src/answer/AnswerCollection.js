@@ -35,6 +35,10 @@ class AnswerCollection {
     this.#items.length = 0;
   }
 
+  [Symbol.iterator]() {
+    return this.#items[Symbol.iterator]();
+  }
+
   toArray() {
     return [...this.#items];
   }

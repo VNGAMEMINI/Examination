@@ -15,9 +15,7 @@ class SubjectCollection {
 
   add(subject) {
     if (!(subject instanceof Subject)) {
-      throw new TypeError(
-        "SubjectCollection only accepts Subject instances"
-      );
+      throw new TypeError("SubjectCollection only accepts Subject instances");
     }
 
     this.#items.push(subject);
@@ -35,6 +33,10 @@ class SubjectCollection {
 
   clear() {
     this.#items.length = 0;
+  }
+
+  [Symbol.iterator]() {
+    return this.#items[Symbol.iterator]();
   }
 
   toArray() {

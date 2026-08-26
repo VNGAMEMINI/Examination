@@ -15,9 +15,7 @@ class QuestionCollection {
 
   add(question) {
     if (!(question instanceof Question)) {
-      throw new TypeError(
-        "QuestionCollection only accepts Question instances"
-      );
+      throw new TypeError("QuestionCollection only accepts Question instances");
     }
 
     this.#items.push(question);
@@ -35,6 +33,10 @@ class QuestionCollection {
 
   clear() {
     this.#items.length = 0;
+  }
+
+  [Symbol.iterator]() {
+    return this.#items[Symbol.iterator]();
   }
 
   toArray() {
