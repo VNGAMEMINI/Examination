@@ -1,10 +1,15 @@
-import SubjectCollection from "../subject/SubjectCollection.js";
+import SubjectCollection
+  from "../subject/SubjectCollection.js";
 
 class Examination {
+  #id;
+  #title;
   #subjects;
   #metadata;
 
   constructor({
+    id = null,
+    title = "",
     subjects = new SubjectCollection(),
     metadata = {}
   } = {}) {
@@ -14,8 +19,18 @@ class Examination {
       );
     }
 
+    this.#id = id;
+    this.#title = title;
     this.#subjects = subjects;
     this.#metadata = metadata;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get title() {
+    return this.#title;
   }
 
   get subjects() {
