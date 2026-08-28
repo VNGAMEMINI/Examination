@@ -17,8 +17,21 @@ export { default as Subject }
 export { default as SubjectCollection }
   from "./subject/SubjectCollection.js";
 
+
+// Examination
 export { default as Examination }
   from "./examination/Examination.js";
+
+export { default as Result }
+  from "./examination/Result.js";
+
+export { default as Session }
+  from "./examination/Session.js";
+
+
+// Score
+export { default as Score }
+  from "./score/Score.js";
 
 
 // Data
@@ -42,6 +55,23 @@ export { default as normalizeSubjectCollection }
 
 export { default as normalizeExamination }
   from "./data/normalizeExamination.js";
+
+
+// Evaluation
+export { default as evaluateAnswer }
+  from "./evaluation/evaluateAnswer.js";
+
+export { default as evaluateQuestion }
+  from "./evaluation/evaluateQuestion.js";
+
+export { default as evaluateQuestionCollection }
+  from "./evaluation/evaluateQuestionCollection.js";
+
+export { default as evaluateSubject }
+  from "./evaluation/evaluateSubject.js";
+
+export { default as evaluateExamination }
+  from "./evaluation/evaluateExamination.js";
 
 
 // Validation

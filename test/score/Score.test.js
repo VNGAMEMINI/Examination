@@ -1,9 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import Result from "../../src/examination/Result.js";
+import Examination from "../../src/examination/Examination.js";
+import SubjectCollection from "../../src/subject/SubjectCollection.js";
+import Subject from "../../src/subject/Subject.js";
+import QuestionCollection from "../../src/question/QuestionCollection.js";
+import Question from "../../src/question/Question.js";
+import AnswerCollection from "../../src/answer/AnswerCollection.js";
+import Answer from "../../src/answer/Answer.js";
 
 import Score from "../../src/score/Score.js";
+import Result from "../../src/examination/Result.js";
 
 test("Score should create Result", () => {
   const score = new Score({
@@ -101,4 +108,38 @@ test("Score should not expose setters", () => {
   }, TypeError);
 
   assert.equal(score.total, 10);
+});
+
+test("Score should create from evaluation", () => {
+  const evaluation = {
+    total: 10,
+    correct: 7,
+    incorrect: 2,
+    unanswered: 1,
+    subjects: [],
+  };
+
+  const score = Score.fromEvaluation(evaluation);
+
+  assert.equal(score.total, 10);
+  assert.equal(score.correct, 7);
+  assert.equal(score.incorrect, 2);
+  assert.equal(score.unanswered, 1);
+  assert.equal(score.points, 7);
+  assert.equal(score.percentage, 70);
+});
+
+
+test("Score.fromEvaluation should reject invalid evaluation", () => {
+  assert.throws(() => {
+    Score.fromEvaluation(null);
+  }, TypeError);
+
+  assert.throws(() => {
+    Score.fromEvaluation(undefined);
+  }, TypeError);
+
+  assert.throws(() => {
+    Score.fromEvaluation("invalid");
+  }, TypeError);
 });

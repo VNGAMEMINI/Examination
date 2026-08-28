@@ -2,42 +2,48 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  // Models
   Answer,
   AnswerCollection,
-
   Question,
   QuestionCollection,
-
   Subject,
   SubjectCollection,
 
+  // Examination
   Examination,
+  Session,
+  Result,
 
+  // Score
+  Score,
+
+  // Data
   normalizeAnswer,
   normalizeAnswerCollection,
-
   normalizeQuestion,
   normalizeQuestionCollection,
-
   normalizeSubject,
   normalizeSubjectCollection,
-
   normalizeExamination,
 
-  ValidationError,
+  // Evaluation
+  evaluateAnswer,
+  evaluateQuestion,
+  evaluateQuestionCollection,
+  evaluateSubject,
+  evaluateExamination,
 
+  // Validation
+  ValidationError,
   validateAnswer,
   validateAnswerCollection,
-
   validateQuestion,
   validateQuestionCollection,
-
   validateSubject,
   validateSubjectCollection,
-
-  validateExamination
+  validateExamination,
 } from "../../src/index.js";
-
 
 test("public API should export models", () => {
   assert.equal(typeof Answer, "function");
@@ -52,7 +58,6 @@ test("public API should export models", () => {
   assert.equal(typeof Examination, "function");
 });
 
-
 test("public API should export normalization functions", () => {
   assert.equal(typeof normalizeAnswer, "function");
   assert.equal(typeof normalizeAnswerCollection, "function");
@@ -65,7 +70,6 @@ test("public API should export normalization functions", () => {
 
   assert.equal(typeof normalizeExamination, "function");
 });
-
 
 test("public API should export validation API", () => {
   assert.equal(typeof ValidationError, "function");
@@ -82,60 +86,33 @@ test("public API should export validation API", () => {
   assert.equal(typeof validateExamination, "function");
 });
 
-
 test("public API should work as a complete pipeline", () => {
-  const examination =
-    normalizeExamination({
-      subjects: [
-        {
-          id: "math",
-          name: "Mathematics",
-          questions: [
-            {
-              q: "2 + 2 = ?",
-              a: [
-                "3",
-                "4",
-                "5"
-              ],
-              correct: 1
-            }
-          ]
-        }
-      ]
-    });
+  const examination = normalizeExamination({
+    subjects: [
+      {
+        id: "math",
+        name: "Mathematics",
+        questions: [
+          {
+            q: "2 + 2 = ?",
+            a: ["3", "4", "5"],
+            correct: 1,
+          },
+        ],
+      },
+    ],
+  });
 
-  assert.ok(
-    examination instanceof SubjectCollection
-  );
+  assert.ok(examination instanceof SubjectCollection);
 
-  assert.equal(
-    examination.length,
-    1
-  );
+  assert.equal(examination.length, 1);
+
+  assert.equal(examination.get(0).name, "Mathematics");
+
+  assert.equal(examination.get(0).questions.get(0).text, "2 + 2 = ?");
 
   assert.equal(
-    examination.get(0).name,
-    "Mathematics"
-  );
-
-  assert.equal(
-    examination
-      .get(0)
-      .questions
-      .get(0)
-      .text,
-    "2 + 2 = ?"
-  );
-
-  assert.equal(
-    examination
-      .get(0)
-      .questions
-      .get(0)
-      .answers
-      .get(1)
-      .correct,
-    true
+    examination.get(0).questions.get(0).answers.get(1).correct,
+    true,
   );
 });

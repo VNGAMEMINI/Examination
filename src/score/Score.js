@@ -6,11 +6,34 @@ class Score {
   #incorrect;
   #unanswered;
 
-  constructor({ total = 0, correct = 0, incorrect = 0, unanswered = 0 } = {}) {
+  constructor({
+    total = 0,
+    correct = 0,
+    incorrect = 0,
+    unanswered = 0
+  } = {}) {
     this.#total = total;
     this.#correct = correct;
     this.#incorrect = incorrect;
     this.#unanswered = unanswered;
+  }
+
+  static fromEvaluation(evaluation) {
+    if (
+      evaluation == null ||
+      typeof evaluation !== "object"
+    ) {
+      throw new TypeError(
+        "Score.fromEvaluation expects an evaluation object"
+      );
+    }
+
+    return new Score({
+      total: evaluation.total,
+      correct: evaluation.correct,
+      incorrect: evaluation.incorrect,
+      unanswered: evaluation.unanswered
+    });
   }
 
   toResult() {
@@ -20,7 +43,7 @@ class Score {
       incorrect: this.#incorrect,
       unanswered: this.#unanswered,
       score: this.points,
-      percentage: this.percentage,
+      percentage: this.percentage
     });
   }
 
