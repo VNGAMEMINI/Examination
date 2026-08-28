@@ -3,6 +3,8 @@ import normalizeSessionAnswers from "../data/normalizeSessionAnswers.js";
 import SESSION_STATES from "./sessionStates.js";
 import evaluateExamination from "../evaluation/evaluateExamination.js";
 import Score from "../score/Score.js";
+import SessionQuestion from "../session/SessionQuestion.js";
+import SessionQuestionCollection from "../session/SessionQuestionCollection.js";
 
 class Session {
   #id;
@@ -11,6 +13,7 @@ class Session {
   #started;
   #completed;
   #metadata;
+  #questions;
 
   constructor({
     id = null,
@@ -30,6 +33,57 @@ class Session {
     this.#started = started;
     this.#completed = completed;
     this.#metadata = metadata;
+
+    this.#questions = this.#selectQuestions();
+  }
+
+  #shuffle(items) {
+    for (let i = items.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+
+    return items;
+  }
+
+  #selectQuestions() {
+    const selected = [];
+
+    for (let subjectIndex = 0; subjectIndex < this.#examination.subjects.length; subjectIndex++) {
+      const subject = this.#examination.subjects.get(subjectIndex);
+
+      for (
+        let questionIndex = 0;
+        questionIndex < subject.questions.length;
+        questionIndex++
+      ) {
+        selected.push(
+          new SessionQuestion({
+            question: subject.questions.get(questionIndex),
+            subjectIndex,
+            questionIndex,
+          }),
+        );
+      }
+    }
+
+    const { limit, randomSen } = this.#examination.settings;
+
+    if (randomSen) {
+      for (let i = selected.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [selected[i], selected[j]] = [selected[j], selected[i]];
+      }
+    }
+
+    const questions =
+      limit === 0
+        ? selected
+        : selected.slice(0, limit);
+
+    return new SessionQuestionCollection(questions);
   }
 
   start() {
@@ -120,6 +174,10 @@ class Session {
     return this.#answers;
   }
 
+  get questions() {
+    return this.#questions.toArray();
+  }
+
   get started() {
     return this.#started;
   }
@@ -142,6 +200,10 @@ class Session {
 
   get metadata() {
     return this.#metadata;
+  }
+
+  get questionCount() {
+    return this.#questions.length;
   }
 }
 

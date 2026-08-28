@@ -425,3 +425,40 @@ test("Session should evaluate unanswered questions", () => {
   assert.equal(result.score, 1);
   assert.equal(result.percentage, 25);
 });
+
+test("Session should use Examination Settings", () => {
+  const examination = createExamination();
+
+  const session = new Session({
+    examination,
+  });
+
+  assert.equal(
+    session.examination.settings,
+    examination.settings
+  );
+});
+
+test("Session should preserve Examination Settings identity", () => {
+  const examination = createExamination();
+
+  const session = new Session({
+    examination,
+  });
+
+  assert.equal(session.examination.settings, examination.settings);
+});
+
+test("Session should expose Examination Settings", () => {
+  const examination = createExamination();
+
+  const session = new Session({
+    examination,
+  });
+
+  assert.ok(session.examination.settings);
+  assert.equal(
+    session.examination.settings.mode.value,
+    examination.settings.mode.value
+  );
+});
