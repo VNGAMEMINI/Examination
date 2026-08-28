@@ -34,6 +34,14 @@ export { default as Score }
   from "./score/Score.js";
 
 
+// Settings
+export { default as Mode }
+  from "./settings/Mode.js";
+
+export { default as Settings }
+  from "./settings/Settings.js";
+
+
 // Data
 export { default as normalizeAnswer }
   from "./data/normalizeAnswer.js";
@@ -55,6 +63,12 @@ export { default as normalizeSubjectCollection }
 
 export { default as normalizeExamination }
   from "./data/normalizeExamination.js";
+
+export { default as normalizeSessionAnswers }
+  from "./data/normalizeSessionAnswers.js";
+
+export { default as summarizeEvaluation }
+  from "./evaluation/summarizeEvaluation.js";
 
 
 // Evaluation

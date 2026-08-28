@@ -116,3 +116,31 @@ test("public API should work as a complete pipeline", () => {
     true,
   );
 });
+
+test("public API should export settings", async () => {
+  const api = await import("../../src/index.js");
+
+  assert.equal(typeof api.Mode, "function");
+  assert.equal(typeof api.Settings, "function");
+
+  assert.equal(api.Mode.FREE, "free");
+  assert.equal(api.Mode.EXAM, "exam");
+});
+
+test("public API should export session normalization", async () => {
+  const api = await import("../../src/index.js");
+
+  assert.equal(
+    typeof api.normalizeSessionAnswers,
+    "function"
+  );
+});
+
+test("public API should export evaluation summary", async () => {
+  const api = await import("../../src/index.js");
+
+  assert.equal(
+    typeof api.summarizeEvaluation,
+    "function"
+  );
+});
