@@ -17,6 +17,7 @@ class Session {
   #metadata;
   #questions;
   #navigation;
+  #timer;
 
   constructor({
     id = null,
@@ -39,6 +40,7 @@ class Session {
 
     this.#questions = this.#selectQuestions();
     this.#navigation = new SessionNavigation(this.#questions);
+    this.#timer = new SessionTimer(this.#examination.settings.timeTotal * 60);
   }
 
   #shuffle(items) {
@@ -97,6 +99,7 @@ class Session {
     }
 
     this.#started = true;
+    this.#timer.start();
 
     return this;
   }
@@ -107,6 +110,7 @@ class Session {
     }
 
     this.#completed = true;
+    this.#timer.stop();
 
     return this;
   }
@@ -223,8 +227,6 @@ class Session {
     };
   }
 
-
-
   get id() {
     return this.#id;
   }
@@ -301,6 +303,10 @@ class Session {
     }
 
     return (this.answeredCount / this.questionCount) * 100;
+  }
+
+  get timer() {
+    return this.#timer;
   }
 }
 

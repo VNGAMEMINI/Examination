@@ -28,6 +28,7 @@ export { default as Settings } from "./settings/Settings.js";
 
 // Time
 export { default as Time } from "./time/Time.js";
+
 export { default as SessionTimer } from "./time/SessionTimer.js";
 
 // Data
@@ -59,6 +60,8 @@ export { default as evaluateQuestionCollection } from "./evaluation/evaluateQues
 export { default as evaluateSubject } from "./evaluation/evaluateSubject.js";
 
 export { default as evaluateExamination } from "./evaluation/evaluateExamination.js";
+
+export { default as Evaluation } from "./evaluation/Evaluation.js";
 
 // Types
 export { default as Type } from "./types/Type.js";
