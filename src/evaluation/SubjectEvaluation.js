@@ -1,36 +1,32 @@
-class Evaluation {
+class SubjectEvaluation {
+  #subject;
   #total;
   #correct;
   #incorrect;
   #unanswered;
-  #subjects;
+  #results;
   #metadata;
 
   constructor({
+    subject,
     total = 0,
     correct = 0,
     incorrect = 0,
     unanswered = 0,
-    subjects = [],
+    results = [],
     metadata = {},
   } = {}) {
+    this.#subject = subject;
     this.#total = total;
     this.#correct = correct;
     this.#incorrect = incorrect;
     this.#unanswered = unanswered;
-    this.#subjects = subjects;
+    this.#results = results;
     this.#metadata = metadata;
   }
 
-  toJSON() {
-    return {
-      total: this.#total,
-      correct: this.#correct,
-      incorrect: this.#incorrect,
-      unanswered: this.#unanswered,
-      subjects: this.#subjects,
-      metadata: this.#metadata,
-    };
+  get subject() {
+    return this.#subject;
   }
 
   get total() {
@@ -49,13 +45,25 @@ class Evaluation {
     return this.#unanswered;
   }
 
-  get subjects() {
-    return this.#subjects;
+  get results() {
+    return this.#results;
   }
 
   get metadata() {
     return this.#metadata;
   }
+
+  toJSON() {
+    return {
+      subject: this.#subject,
+      total: this.#total,
+      correct: this.#correct,
+      incorrect: this.#incorrect,
+      unanswered: this.#unanswered,
+      results: this.#results,
+      metadata: this.#metadata,
+    };
+  }
 }
 
-export default Evaluation;
+export default SubjectEvaluation;

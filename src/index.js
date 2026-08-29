@@ -63,6 +63,8 @@ export { default as evaluateExamination } from "./evaluation/evaluateExamination
 
 export { default as Evaluation } from "./evaluation/Evaluation.js";
 
+export { default as SubjectEvaluation } from "./evaluation/SubjectEvaluation.js";
+
 // Types
 export { default as Type } from "./types/Type.js";
 

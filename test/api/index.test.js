@@ -130,17 +130,17 @@ test("public API should export settings", async () => {
 test("public API should export session normalization", async () => {
   const api = await import("../../src/index.js");
 
-  assert.equal(
-    typeof api.normalizeSessionAnswers,
-    "function"
-  );
+  assert.equal(typeof api.normalizeSessionAnswers, "function");
 });
 
 test("public API should export evaluation summary", async () => {
   const api = await import("../../src/index.js");
 
-  assert.equal(
-    typeof api.summarizeEvaluation,
-    "function"
-  );
+  assert.equal(typeof api.summarizeEvaluation, "function");
+});
+
+test("public API should export SubjectEvaluation", async () => {
+  const api = await import("../../src/index.js");
+
+  assert.equal(typeof api.SubjectEvaluation, "function");
 });

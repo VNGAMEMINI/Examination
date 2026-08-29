@@ -1,35 +1,33 @@
 import Examination from "../examination/Examination.js";
+import Evaluation from "./Evaluation.js";
 import evaluateSubject from "./evaluateSubject.js";
 import summarizeEvaluation from "./summarizeEvaluation.js";
 
 function evaluateExamination(examination, selections = []) {
   if (!(examination instanceof Examination)) {
-    throw new TypeError(
-      "evaluateExamination expects an Examination instance"
-    );
+    throw new TypeError("evaluateExamination expects an Examination instance");
   }
 
   const subjects = examination.subjects.toArray();
 
-  const subjectResults = subjects.map(
-    (subject, subjectIndex) => {
-      const subjectSelections = Array.isArray(selections)
-        ? selections[subjectIndex]
-        : undefined;
+  const subjectEvaluations = subjects.map((subject, subjectIndex) => {
+    const subjectSelections = Array.isArray(selections)
+      ? selections[subjectIndex]
+      : undefined;
 
-      return evaluateSubject(
-        subject,
-        subjectSelections
-      );
-    }
+    return evaluateSubject(subject, subjectSelections);
+  });
+
+  const results = subjectEvaluations.flatMap(
+    (evaluation) => evaluation.results,
   );
 
-  const results = subjectResults.flat();
+  const summary = summarizeEvaluation(results);
 
-  return {
-    ...summarizeEvaluation(results),
-    subjects: subjectResults,
-  };
+  return new Evaluation({
+    ...summary,
+    subjects: subjectEvaluations,
+  });
 }
 
 export default evaluateExamination;

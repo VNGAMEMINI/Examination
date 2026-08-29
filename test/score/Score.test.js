@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import Evaluation from "../../src/evaluation/Evaluation.js";
 import Examination from "../../src/examination/Examination.js";
 import SubjectCollection from "../../src/subject/SubjectCollection.js";
 import Subject from "../../src/subject/Subject.js";
@@ -111,13 +112,13 @@ test("Score should not expose setters", () => {
 });
 
 test("Score should create from evaluation", () => {
-  const evaluation = {
+  const evaluation = new Evaluation({
     total: 10,
     correct: 7,
     incorrect: 2,
     unanswered: 1,
     subjects: [],
-  };
+  });
 
   const score = Score.fromEvaluation(evaluation);
 
@@ -128,7 +129,6 @@ test("Score should create from evaluation", () => {
   assert.equal(score.points, 7);
   assert.equal(score.percentage, 70);
 });
-
 
 test("Score.fromEvaluation should reject invalid evaluation", () => {
   assert.throws(() => {
@@ -141,5 +141,16 @@ test("Score.fromEvaluation should reject invalid evaluation", () => {
 
   assert.throws(() => {
     Score.fromEvaluation("invalid");
+  }, TypeError);
+});
+
+test("Score.fromEvaluation should reject plain object", () => {
+  assert.throws(() => {
+    Score.fromEvaluation({
+      total: 10,
+      correct: 7,
+      incorrect: 2,
+      unanswered: 1,
+    });
   }, TypeError);
 });

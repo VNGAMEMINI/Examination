@@ -9,9 +9,7 @@ import QuestionCollection from "../../src/question/QuestionCollection.js";
 import Answer from "../../src/answer/Answer.js";
 import AnswerCollection from "../../src/answer/AnswerCollection.js";
 
-import evaluateExamination
-  from "../../src/evaluation/evaluateExamination.js";
-
+import evaluateExamination from "../../src/evaluation/evaluateExamination.js";
 
 function createQuestion(correctIndex = 0) {
   return new Question({
@@ -32,7 +30,6 @@ function createQuestion(correctIndex = 0) {
   });
 }
 
-
 function createSubject(questionCount = 2) {
   const questions = [];
 
@@ -47,18 +44,13 @@ function createSubject(questionCount = 2) {
   });
 }
 
-
 function createExamination() {
   return new Examination({
     id: "exam-1",
     title: "Test Examination",
-    subjects: new SubjectCollection([
-      createSubject(2),
-      createSubject(2),
-    ]),
+    subjects: new SubjectCollection([createSubject(2), createSubject(2)]),
   });
 }
-
 
 test("evaluateExamination should evaluate every Subject", () => {
   const examination = createExamination();
@@ -76,7 +68,6 @@ test("evaluateExamination should evaluate every Subject", () => {
   assert.equal(result.subjects.length, 2);
 });
 
-
 test("evaluateExamination should detect incorrect answers", () => {
   const examination = createExamination();
 
@@ -90,7 +81,6 @@ test("evaluateExamination should detect incorrect answers", () => {
   assert.equal(result.incorrect, 2);
   assert.equal(result.unanswered, 0);
 });
-
 
 test("evaluateExamination should detect unanswered questions", () => {
   const examination = createExamination();
@@ -106,7 +96,6 @@ test("evaluateExamination should detect unanswered questions", () => {
   assert.equal(result.unanswered, 2);
 });
 
-
 test("evaluateExamination should preserve Subject order", () => {
   const examination = createExamination();
 
@@ -116,10 +105,15 @@ test("evaluateExamination should preserve Subject order", () => {
   ]);
 
   assert.equal(result.subjects.length, 2);
-  assert.equal(result.subjects[0].length, 2);
-  assert.equal(result.subjects[1].length, 2);
-});
 
+  assert.equal(result.subjects[0].results.length, 2);
+
+  assert.equal(result.subjects[1].results.length, 2);
+
+  assert.equal(result.subjects[0].subject.id, "subject-1");
+
+  assert.equal(result.subjects[1].subject.id, "subject-1");
+});
 
 test("evaluateExamination should support empty Examination", () => {
   const examination = new Examination();
@@ -133,7 +127,6 @@ test("evaluateExamination should support empty Examination", () => {
 
   assert.deepEqual(result.subjects, []);
 });
-
 
 test("evaluateExamination should reject invalid Examination", () => {
   assert.throws(() => {

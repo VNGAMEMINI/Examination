@@ -1,4 +1,5 @@
 import Result from "../examination/Result.js";
+import Evaluation from "../evaluation/Evaluation.js";
 
 class Score {
   #total;
@@ -6,12 +7,7 @@ class Score {
   #incorrect;
   #unanswered;
 
-  constructor({
-    total = 0,
-    correct = 0,
-    incorrect = 0,
-    unanswered = 0
-  } = {}) {
+  constructor({ total = 0, correct = 0, incorrect = 0, unanswered = 0 } = {}) {
     this.#total = total;
     this.#correct = correct;
     this.#incorrect = incorrect;
@@ -19,12 +15,9 @@ class Score {
   }
 
   static fromEvaluation(evaluation) {
-    if (
-      evaluation == null ||
-      typeof evaluation !== "object"
-    ) {
+    if (!(evaluation instanceof Evaluation)) {
       throw new TypeError(
-        "Score.fromEvaluation expects an evaluation object"
+        "Score.fromEvaluation expects an Evaluation instance",
       );
     }
 
@@ -32,7 +25,7 @@ class Score {
       total: evaluation.total,
       correct: evaluation.correct,
       incorrect: evaluation.incorrect,
-      unanswered: evaluation.unanswered
+      unanswered: evaluation.unanswered,
     });
   }
 
@@ -43,7 +36,7 @@ class Score {
       incorrect: this.#incorrect,
       unanswered: this.#unanswered,
       score: this.points,
-      percentage: this.percentage
+      percentage: this.percentage,
     });
   }
 
