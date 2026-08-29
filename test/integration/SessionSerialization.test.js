@@ -86,9 +86,7 @@ test("Session should serialize answers", () => {
 
   const data = session.toJSON();
 
-  assert.deepEqual(data.answers, [
-    [1, [0, 1]],
-  ]);
+  assert.deepEqual(data.answers, [[1, [0, 1]]]);
 });
 
 test("Session should serialize started and completed state", () => {
@@ -118,8 +116,35 @@ test("Session serialization should not expose internal answers", () => {
 
   data.answers[0][0].push(99);
 
-  assert.deepEqual(
-    session.answers[0][0],
-    [0, 1],
-  );
+  assert.deepEqual(session.answers[0][0], [0, 1]);
+});
+
+test("Session should restore and continue evaluation", () => {
+  const examination = createExamination();
+
+  const session = new Session({
+    examination,
+    metadata: {
+      mode: "exam",
+    },
+  });
+
+  session.start();
+
+  session.answer(0, 0, 0);
+
+  const data = JSON.parse(JSON.stringify(session));
+
+  const restored = Session.fromJSON(data, examination);
+
+  restored.answer(0, 1, 1);
+  restored.answer(1, 0, 0);
+
+  const result = restored.evaluate();
+
+  assert.equal(result.total, 4);
+  assert.equal(result.correct, 3);
+  assert.equal(result.incorrect, 0);
+  assert.equal(result.unanswered, 1);
+  assert.equal(result.percentage, 75);
 });

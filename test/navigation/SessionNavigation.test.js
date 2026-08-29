@@ -1,104 +1,113 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import SessionNavigation from "../../src/navigation/SessionNavigation.js";
+import Question from "../../src/question/Question.js";
 import SessionQuestion from "../../src/session/SessionQuestion.js";
 import SessionQuestionCollection from "../../src/session/SessionQuestionCollection.js";
-import Question from "../../src/question/Question.js";
 
-function createQuestion(id) {
-  return new Question({
+import SessionNavigation from "../../src/navigation/SessionNavigation.js";
+
+function createSessionQuestion(id, subjectIndex = 0, questionIndex = 0) {
+  const question = new Question({
     id,
     text: `Question ${id}`,
+  });
+
+  return new SessionQuestion({
+    question,
+    subjectIndex,
+    questionIndex,
   });
 }
 
 function createNavigation() {
-  const questions = new SessionQuestionCollection([
-    new SessionQuestion({
-      question: createQuestion("q1"),
-      subjectIndex: 0,
-      questionIndex: 0,
-    }),
-    new SessionQuestion({
-      question: createQuestion("q2"),
-      subjectIndex: 0,
-      questionIndex: 1,
-    }),
-    new SessionQuestion({
-      question: createQuestion("q3"),
-      subjectIndex: 0,
-      questionIndex: 2,
-    }),
-  ]);
+  const q1 = createSessionQuestion("q1", 0, 0);
+  const q2 = createSessionQuestion("q2", 0, 1);
+  const q3 = createSessionQuestion("q3", 1, 0);
 
-  return new SessionNavigation(questions);
+  const questions = new SessionQuestionCollection([q1, q2, q3]);
+
+  return {
+    navigation: new SessionNavigation(questions),
+    questions: [q1, q2, q3],
+  };
 }
 
 test("SessionNavigation should create correctly", () => {
-  const navigation = createNavigation();
+  const { navigation, questions } = createNavigation();
 
   assert.equal(navigation.currentIndex, 0);
-  assert.ok(navigation.current);
+  assert.equal(navigation.current, questions[0]);
+  assert.equal(navigation.questions.length, 3);
 });
 
 test("SessionNavigation should start at first question", () => {
-  const navigation = createNavigation();
+  const { navigation, questions } = createNavigation();
 
-  assert.equal(navigation.current.question.id, "q1");
-});
-
-test("SessionNavigation should expose current question", () => {
-  const navigation = createNavigation();
-
-  assert.equal(navigation.current.question.id, "q1");
-});
-
-test("SessionNavigation should expose hasNext", () => {
-  const navigation = createNavigation();
-
-  assert.equal(navigation.hasNext, true);
-
-  navigation.last();
-
-  assert.equal(navigation.hasNext, false);
-});
-
-test("SessionNavigation should expose hasPrevious", () => {
-  const navigation = createNavigation();
-
+  assert.equal(navigation.current, questions[0]);
+  assert.equal(navigation.currentIndex, 0);
   assert.equal(navigation.hasPrevious, false);
-
-  navigation.next();
-
-  assert.equal(navigation.hasPrevious, true);
+  assert.equal(navigation.hasNext, true);
 });
 
 test("SessionNavigation next should move forward", () => {
-  const navigation = createNavigation();
+  const { navigation, questions } = createNavigation();
 
-  const result = navigation.next();
+  navigation.next();
 
-  assert.equal(result, navigation);
   assert.equal(navigation.currentIndex, 1);
-  assert.equal(navigation.current.question.id, "q2");
+  assert.equal(navigation.current, questions[1]);
+
+  navigation.next();
+
+  assert.equal(navigation.currentIndex, 2);
+  assert.equal(navigation.current, questions[2]);
+});
+
+test("SessionNavigation next should not pass last question", () => {
+  const { navigation, questions } = createNavigation();
+
+  navigation.last();
+
+  assert.equal(navigation.current, questions[2]);
+  assert.equal(navigation.hasNext, false);
+
+  navigation.next();
+
+  assert.equal(navigation.currentIndex, 2);
+  assert.equal(navigation.current, questions[2]);
 });
 
 test("SessionNavigation previous should move backward", () => {
-  const navigation = createNavigation();
+  const { navigation, questions } = createNavigation();
 
-  navigation.next();
-  navigation.next();
+  navigation.last();
 
-  const result = navigation.previous();
+  navigation.previous();
 
-  assert.equal(result, navigation);
   assert.equal(navigation.currentIndex, 1);
-  assert.equal(navigation.current.question.id, "q2");
+  assert.equal(navigation.current, questions[1]);
+
+  navigation.previous();
+
+  assert.equal(navigation.currentIndex, 0);
+  assert.equal(navigation.current, questions[0]);
+});
+
+test("SessionNavigation previous should not pass first question", () => {
+  const { navigation, questions } = createNavigation();
+
+  assert.equal(navigation.currentIndex, 0);
+  assert.equal(navigation.hasPrevious, false);
+
+  navigation.previous();
+
+  assert.equal(navigation.currentIndex, 0);
+  assert.equal(navigation.current, questions[0]);
 });
 
 test("SessionNavigation first should move to first question", () => {
-  const navigation = createNavigation();
+  const { navigation, questions } = createNavigation();
 
   navigation.last();
 
@@ -106,61 +115,60 @@ test("SessionNavigation first should move to first question", () => {
 
   assert.equal(result, navigation);
   assert.equal(navigation.currentIndex, 0);
-  assert.equal(navigation.current.question.id, "q1");
+  assert.equal(navigation.current, questions[0]);
 });
 
 test("SessionNavigation last should move to last question", () => {
-  const navigation = createNavigation();
+  const { navigation, questions } = createNavigation();
 
   const result = navigation.last();
 
   assert.equal(result, navigation);
   assert.equal(navigation.currentIndex, 2);
-  assert.equal(navigation.current.question.id, "q3");
+  assert.equal(navigation.current, questions[2]);
 });
 
-test("SessionNavigation should not move beyond last question", () => {
-  const navigation = createNavigation();
+test("SessionNavigation should support chaining", () => {
+  const { navigation, questions } = createNavigation();
 
-  navigation.last();
+  navigation.next().next().previous();
 
-  navigation.next();
-
-  assert.equal(navigation.currentIndex, 2);
-  assert.equal(navigation.current.question.id, "q3");
+  assert.equal(navigation.currentIndex, 1);
+  assert.equal(navigation.current, questions[1]);
 });
 
-test("SessionNavigation should not move before first question", () => {
-  const navigation = createNavigation();
+test("SessionNavigation should expose questions", () => {
+  const { navigation, questions } = createNavigation();
 
-  navigation.previous();
+  assert.equal(navigation.questions.get(0), questions[0]);
+  assert.equal(navigation.questions.get(1), questions[1]);
+  assert.equal(navigation.questions.get(2), questions[2]);
+});
+
+test("SessionNavigation should support empty collection", () => {
+  const questions = new SessionQuestionCollection();
+  const navigation = new SessionNavigation(questions);
 
   assert.equal(navigation.currentIndex, 0);
-  assert.equal(navigation.current.question.id, "q1");
-});
+  assert.equal(navigation.current, undefined);
+  assert.equal(navigation.hasNext, false);
+  assert.equal(navigation.hasPrevious, false);
 
-test("SessionNavigation should preserve SessionQuestion identity", () => {
-  const navigation = createNavigation();
-
-  const first = navigation.current;
-
-  navigation.next();
-
-  navigation.previous();
-
-  assert.strictEqual(navigation.current, first);
-});
-
-test("SessionNavigation should not mutate collection", () => {
-  const navigation = createNavigation();
-
-  const before = navigation.questions.toArray();
-
-  navigation.next();
   navigation.next();
   navigation.previous();
+  navigation.first();
+  navigation.last();
 
-  const after = navigation.questions.toArray();
+  assert.equal(navigation.currentIndex, 0);
+  assert.equal(navigation.current, undefined);
+});
 
-  assert.deepEqual(after, before);
+test("SessionNavigation should reject invalid questions", () => {
+  assert.throws(() => {
+    new SessionNavigation([]);
+  }, TypeError);
+
+  assert.throws(() => {
+    new SessionNavigation({});
+  }, TypeError);
 });

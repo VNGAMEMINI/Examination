@@ -90,6 +90,13 @@ export { default as ObjectCompare } from "./compare/ObjectCompare.js";
 // Random
 export { default as Random } from "./random/Random.js";
 
+// Session
+export { default as SessionQuestion } from "./session/SessionQuestion.js";
+
+export { default as SessionQuestionCollection } from "./session/SessionQuestionCollection.js";
+
+export { default as SessionNavigation } from "./navigation/SessionNavigation.js";
+
 // Validation
 export {
   ValidationError,
