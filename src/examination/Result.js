@@ -52,6 +52,18 @@ class Result {
   get metadata() {
     return this.#metadata;
   }
+
+  toJSON() {
+    return {
+      total: this.#total,
+      correct: this.#correct,
+      incorrect: this.#incorrect,
+      unanswered: this.#unanswered,
+      score: this.#score,
+      percentage: this.#percentage,
+      metadata: this.#metadata,
+    };
+  }
 }
 
 export default Result;

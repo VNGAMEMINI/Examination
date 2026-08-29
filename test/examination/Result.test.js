@@ -125,3 +125,51 @@ test("Result should not expose setters", () => {
     10
   );
 });
+
+test("Result should serialize correctly", () => {
+  const metadata = {
+    mode: "exam",
+    duration: 120,
+  };
+
+  const result = new Result({
+    total: 10,
+    correct: 7,
+    incorrect: 2,
+    unanswered: 1,
+    score: 7,
+    percentage: 70,
+    metadata,
+  });
+
+  assert.deepEqual(result.toJSON(), {
+    total: 10,
+    correct: 7,
+    incorrect: 2,
+    unanswered: 1,
+    score: 7,
+    percentage: 70,
+    metadata,
+  });
+});
+
+test("Result should work with JSON.stringify", () => {
+  const result = new Result({
+    total: 4,
+    correct: 3,
+    incorrect: 1,
+    score: 3,
+    percentage: 75,
+  });
+
+  const data = JSON.parse(
+    JSON.stringify(result),
+  );
+
+  assert.equal(data.total, 4);
+  assert.equal(data.correct, 3);
+  assert.equal(data.incorrect, 1);
+  assert.equal(data.unanswered, 0);
+  assert.equal(data.score, 3);
+  assert.equal(data.percentage, 75);
+});
