@@ -28,6 +28,7 @@ export { default as Settings } from "./settings/Settings.js";
 
 // Time
 export { default as Time } from "./time/Time.js";
+export { default as SessionTimer } from "./time/SessionTimer.js";
 
 // Data
 export { default as normalizeAnswer } from "./data/normalizeAnswer.js";

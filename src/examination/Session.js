@@ -5,6 +5,8 @@ import evaluateExamination from "../evaluation/evaluateExamination.js";
 import Score from "../score/Score.js";
 import SessionQuestion from "../session/SessionQuestion.js";
 import SessionQuestionCollection from "../session/SessionQuestionCollection.js";
+import SessionNavigation from "../navigation/SessionNavigation.js";
+import SessionTimer from "../time/SessionTimer.js";
 
 class Session {
   #id;
@@ -14,6 +16,7 @@ class Session {
   #completed;
   #metadata;
   #questions;
+  #navigation;
 
   constructor({
     id = null,
@@ -35,6 +38,7 @@ class Session {
     this.#metadata = metadata;
 
     this.#questions = this.#selectQuestions();
+    this.#navigation = new SessionNavigation(this.#questions);
   }
 
   #shuffle(items) {
@@ -50,7 +54,11 @@ class Session {
   #selectQuestions() {
     const selected = [];
 
-    for (let subjectIndex = 0; subjectIndex < this.#examination.subjects.length; subjectIndex++) {
+    for (
+      let subjectIndex = 0;
+      subjectIndex < this.#examination.subjects.length;
+      subjectIndex++
+    ) {
       const subject = this.#examination.subjects.get(subjectIndex);
 
       for (
@@ -78,10 +86,7 @@ class Session {
       }
     }
 
-    const questions =
-      limit === 0
-        ? selected
-        : selected.slice(0, limit);
+    const questions = limit === 0 ? selected : selected.slice(0, limit);
 
     return new SessionQuestionCollection(questions);
   }
@@ -162,6 +167,64 @@ class Session {
     return score.toResult();
   }
 
+  answerCurrent(selection) {
+    const current = this.#navigation.current;
+
+    if (!current) {
+      throw new RangeError("Session has no current question");
+    }
+
+    return this.answer(current.subjectIndex, current.questionIndex, selection);
+  }
+
+  static fromJSON(data, examination) {
+    if (data == null || typeof data !== "object" || Array.isArray(data)) {
+      throw new TypeError("Session.fromJSON expects a data object");
+    }
+
+    if (!(examination instanceof Examination)) {
+      throw new TypeError("Session.fromJSON expects an Examination");
+    }
+
+    if (
+      data.examinationId !== undefined &&
+      data.examinationId !== examination.id
+    ) {
+      throw new Error("Session examination id does not match");
+    }
+
+    return new Session({
+      id: data.id ?? null,
+      examination,
+      answers: data.answers ?? [],
+      started: data.started ?? false,
+      completed: data.completed ?? false,
+      metadata:
+        data.metadata && typeof data.metadata === "object"
+          ? { ...data.metadata }
+          : {},
+    });
+  }
+
+  toJSON() {
+    return {
+      id: this.#id,
+      examinationId: this.#examination.id,
+      answers: this.#answers.map((subjectAnswers) =>
+        Array.isArray(subjectAnswers)
+          ? subjectAnswers.map((selection) =>
+              Array.isArray(selection) ? [...selection] : selection,
+            )
+          : subjectAnswers,
+      ),
+      started: this.#started,
+      completed: this.#completed,
+      metadata: this.#metadata,
+    };
+  }
+
+
+
   get id() {
     return this.#id;
   }
@@ -204,6 +267,40 @@ class Session {
 
   get questionCount() {
     return this.#questions.length;
+  }
+
+  get navigation() {
+    return this.#navigation;
+  }
+
+  get answeredCount() {
+    let count = 0;
+
+    for (const subjectAnswers of this.#answers) {
+      if (!Array.isArray(subjectAnswers)) {
+        continue;
+      }
+
+      for (const answer of subjectAnswers) {
+        if (answer !== undefined && answer !== null) {
+          count += 1;
+        }
+      }
+    }
+
+    return count;
+  }
+
+  get unansweredCount() {
+    return this.questionCount - this.answeredCount;
+  }
+
+  get progress() {
+    if (this.questionCount === 0) {
+      return 0;
+    }
+
+    return (this.answeredCount / this.questionCount) * 100;
   }
 }
 
