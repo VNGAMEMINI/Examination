@@ -7,14 +7,35 @@ class Question {
   #type;
   #metadata;
 
-  constructor({
-    id = null,
-    text = "",
-    answers = new AnswerCollection(),
-    type = "single",
-    metadata = {}
-  } = {}) {
-    if (!(answers instanceof AnswerCollection)) {
+  constructor(textOrOptions, answers) {
+    let id;
+    let text;
+    let questionAnswers;
+    let type;
+    let metadata;
+
+    if (
+      textOrOptions !== null &&
+      typeof textOrOptions === "object" &&
+      !Array.isArray(textOrOptions)
+    ) {
+      ({
+        id = null,
+        text = "",
+        answers: questionAnswers = new AnswerCollection(),
+        type = "single",
+        metadata = {},
+      } = textOrOptions);
+    } else {
+      id = null;
+      text = textOrOptions ?? "";
+      questionAnswers =
+        answers ?? new AnswerCollection();
+      type = "single";
+      metadata = {};
+    }
+
+    if (!(questionAnswers instanceof AnswerCollection)) {
       throw new TypeError(
         "Question answers must be an AnswerCollection"
       );
@@ -22,7 +43,7 @@ class Question {
 
     this.#id = id;
     this.#text = text;
-    this.#answers = answers;
+    this.#answers = questionAnswers;
     this.#type = type;
     this.#metadata = metadata;
   }
@@ -45,6 +66,16 @@ class Question {
 
   get metadata() {
     return this.#metadata;
+  }
+
+  toJSON() {
+    return {
+      id: this.#id,
+      text: this.#text,
+      answers: this.#answers.toArray(),
+      type: this.#type,
+      metadata: this.#metadata,
+    };
   }
 }
 

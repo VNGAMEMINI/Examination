@@ -71,15 +71,3 @@ export { default as TypeRegistry } from "./types/TypeRegistry.js";
 
 // Session states
 export { default as SESSION_STATES } from "./examination/sessionStates.js";
-
-// Validation
-export {
-  ValidationError,
-  validateAnswer,
-  validateAnswerCollection,
-  validateQuestion,
-  validateQuestionCollection,
-  validateSubject,
-  validateSubjectCollection,
-  validateExamination,
-} from "./validation/index.js";

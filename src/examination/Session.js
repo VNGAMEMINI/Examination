@@ -99,7 +99,9 @@ class Session {
 
   start() {
     if (this.#completed) {
-      throw new Error("Cannot start a completed Session");
+      throw new SessionError("Cannot start a completed Session", {
+        code: "SESSION_ALREADY_COMPLETED",
+      });
     }
 
     this.#started = true;
@@ -110,7 +112,9 @@ class Session {
 
   complete() {
     if (!this.#started) {
-      throw new Error("Cannot complete a Session that has not started");
+      throw new SessionError("Cannot complete a Session that has not started", {
+        code: "SESSION_NOT_STARTED",
+      });
     }
 
     this.#completed = true;
@@ -121,11 +125,15 @@ class Session {
 
   answer(subjectIndex, questionIndex, selection) {
     if (!this.#started) {
-      throw new Error("Cannot answer a Session that has not started");
+      throw new SessionError("Cannot answer a Session that has not started", {
+        code: "SESSION_NOT_STARTED",
+      });
     }
 
     if (this.#completed) {
-      throw new Error("Cannot answer a completed Session");
+      throw new SessionError("Cannot answer a completed Session", {
+        code: "SESSION_ALREADY_COMPLETED",
+      });
     }
 
     if (!Number.isInteger(subjectIndex) || subjectIndex < 0) {
@@ -165,7 +173,9 @@ class Session {
 
   evaluate() {
     if (!this.#started) {
-      throw new Error("Cannot evaluate a Session that has not started");
+      throw new SessionError("Cannot evaluate a Session that has not started", {
+        code: "SESSION_NOT_STARTED",
+      });
     }
 
     const evaluation = evaluateExamination(this.#examination, this.#answers);
