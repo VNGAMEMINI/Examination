@@ -26,6 +26,7 @@ class Session {
     started = false,
     completed = false,
     metadata = {},
+    timer = null,
   } = {}) {
     if (!(examination instanceof Examination)) {
       throw new TypeError("Session examination must be an Examination");
@@ -40,7 +41,10 @@ class Session {
 
     this.#questions = this.#selectQuestions();
     this.#navigation = new SessionNavigation(this.#questions);
-    this.#timer = new SessionTimer(this.#examination.settings.timeTotal * 60);
+    this.#timer =
+      timer instanceof SessionTimer
+        ? timer
+        : new SessionTimer(this.#examination.settings.timeTotal * 60);
   }
 
   #shuffle(items) {
@@ -207,6 +211,10 @@ class Session {
         data.metadata && typeof data.metadata === "object"
           ? { ...data.metadata }
           : {},
+      timer:
+        data.timer && typeof data.timer === "object"
+          ? SessionTimer.fromJSON(data.timer)
+          : null,
     });
   }
 
@@ -224,6 +232,7 @@ class Session {
       started: this.#started,
       completed: this.#completed,
       metadata: this.#metadata,
+      timer: this.#timer.toJSON(),
     };
   }
 

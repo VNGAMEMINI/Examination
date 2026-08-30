@@ -148,3 +148,18 @@ test("Session should restore and continue evaluation", () => {
   assert.equal(result.unanswered, 1);
   assert.equal(result.percentage, 75);
 });
+
+test("Session serialization should include timer", () => {
+  const examination = createExamination();
+
+  const session = new Session({
+    examination,
+  });
+
+  session.start();
+
+  const data = session.toJSON();
+
+  assert.ok(data.timer);
+  assert.equal(typeof data.timer, "object");
+});
