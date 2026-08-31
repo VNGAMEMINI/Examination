@@ -1,0 +1,31 @@
+EXAMINATION/
+│
+├── src/
+│   │
+│   ├── Examination.js
+│   │
+│   ├── normalize/
+│   │   └── normalize.js
+│   │
+│   ├── validate/
+│   │   └── validate.js
+│   │
+│   ├── question/
+│   │   └── question.js
+│   │
+│   ├── answer/
+│   │   └── answer.js
+│   │
+│   ├── compare/
+│   │   └── compare.js
+│   │
+│   └── result/
+│       └── result.js
+│
+├── tests/
+│
+├── docs/
+├── SKILL.md
+├── RULES.md
+├── CONTEXT.md
+└── README.md
