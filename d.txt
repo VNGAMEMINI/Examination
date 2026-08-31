@@ -29,3 +29,11 @@ EXAMINATION/
 ├── RULES.md
 ├── CONTEXT.md
 └── README.md
+
+mkdir normalize/
+validate/
+question/
+answer/
+compare/
+result/
+
