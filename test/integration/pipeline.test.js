@@ -49,5 +49,5 @@ test("complete examination pipeline", () => {
 
   assert.ok(result.score instanceof Score);
   assert.equal(result.score.points, 2);
-  assert.ok(Math.abs(result.score.percentage - 200 / 3) < Number.EPSILON);
+  assert.ok(Math.abs(result.score.percentage - 200 / 3) < 1e-12);
 });

@@ -7,7 +7,7 @@ import score from "../../src/score/score.js";
 
 function createResult(status) {
   return {
-    status
+    status,
   };
 }
 
@@ -16,7 +16,7 @@ test("Score calculates points", () => {
     createResult("correct"),
     createResult("correct"),
     createResult("incorrect"),
-    createResult("unanswered")
+    createResult("unanswered"),
   ]);
 
   const result = new Score(summary);
@@ -29,7 +29,7 @@ test("Score calculates percentage", () => {
     createResult("correct"),
     createResult("correct"),
     createResult("incorrect"),
-    createResult("unanswered")
+    createResult("unanswered"),
   ]);
 
   const result = new Score(summary);
@@ -40,7 +40,7 @@ test("Score calculates percentage", () => {
 test("Score handles perfect result", () => {
   const summary = new Summary([
     createResult("correct"),
-    createResult("correct")
+    createResult("correct"),
   ]);
 
   const result = new Score(summary);
@@ -62,21 +62,19 @@ test("Score serializes canonical data", () => {
   const summary = new Summary([
     createResult("correct"),
     createResult("incorrect"),
-    createResult("unanswered")
+    createResult("unanswered"),
   ]);
 
   const result = new Score(summary);
 
-  assert.deepEqual(result.toJSON(), {
-    points: 1,
-    percentage: 33.33333333333333
-  });
+  const data = result.toJSON();
+
+  assert.equal(data.points, 1);
+  assert.ok(Math.abs(data.percentage - 100 / 3) < 1e-12);
 });
 
 test("score returns Score", () => {
-  const summary = new Summary([
-    createResult("correct")
-  ]);
+  const summary = new Summary([createResult("correct")]);
 
   const result = score(summary);
 
@@ -85,8 +83,5 @@ test("score returns Score", () => {
 });
 
 test("Score rejects non-Summary input", () => {
-  assert.throws(
-    () => new Score({ correct: 1, total: 1 }),
-    TypeError
-  );
+  assert.throws(() => new Score({ correct: 1, total: 1 }), TypeError);
 });

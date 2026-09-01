@@ -12,7 +12,7 @@ export default class Score {
     this.#points = summary.correct;
 
     this.#percentage =
-      summary.total === 0 ? 0 : (summary.correct * 100) / summary.total;
+      summary.total === 0 ? 0 : (summary.correct / summary.total) * 100;
   }
 
   get points() {
