@@ -37,3 +37,44 @@ answer/
 compare/
 result/
 
+
+PHASE 0
+Repository cleanup
+        ↓
+PHASE 1
+Canonical Data Model
+        ↓
+PHASE 2
+Normalization
+        ↓
+PHASE 3
+Validation
+        ↓
+PHASE 4
+Question / Answer
+        ↓
+PHASE 5
+Compare
+        ↓
+PHASE 6
+AnswerResult
+        ↓
+PHASE 7
+ExamResult
+        ↓
+PHASE 8
+Examination public API
+        ↓
+PHASE 9
+Complete test suite
+        ↓
+PHASE 10
+Session
+        ↓
+PHASE 11
+Extensibility
+        ↓
+PHASE 12
+Package / README / CHANGELOG
+        ↓
+v0.1.0
