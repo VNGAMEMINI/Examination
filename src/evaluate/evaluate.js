@@ -9,10 +9,22 @@ function normalizeActual(actual) {
   }
 
   if (Array.isArray(actual)) {
-    return actual.map(String);
+    return [...new Set(actual.map(String))];
   }
 
   return [String(actual)];
+}
+
+function resolveActual(question, actual) {
+  const values = normalizeActual(actual);
+
+  return values.map((value) => {
+    const answer = question.answers.find(
+      (answer) => answer.id === value || answer.text === value,
+    );
+
+    return answer?.id ?? value;
+  });
 }
 
 export function evaluate(question, actual) {
@@ -22,7 +34,7 @@ export function evaluate(question, actual) {
 
   validateQuestion(question);
 
-  const normalizedActual = normalizeActual(actual);
+  const normalizedActual = resolveActual(question, actual);
 
   if (normalizedActual.length === 0) {
     return new Result({

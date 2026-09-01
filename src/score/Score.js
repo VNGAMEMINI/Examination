@@ -6,17 +6,13 @@ export default class Score {
 
   constructor(summary) {
     if (!(summary instanceof Summary)) {
-      throw new TypeError(
-        "Score requires a Summary instance."
-      );
+      throw new TypeError("Score requires a Summary instance.");
     }
 
     this.#points = summary.correct;
 
     this.#percentage =
-      summary.total === 0
-        ? 0
-        : (summary.correct / summary.total) * 100;
+      summary.total === 0 ? 0 : (summary.correct * 100) / summary.total;
   }
 
   get points() {
@@ -30,7 +26,7 @@ export default class Score {
   toJSON() {
     return {
       points: this.#points,
-      percentage: this.#percentage
+      percentage: this.#percentage,
     };
   }
 }
