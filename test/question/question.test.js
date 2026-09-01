@@ -73,3 +73,148 @@ test("Question serializes canonical data", () => {
     metadata: {},
   });
 });
+
+test("Question protects answers array from external mutation", () => {
+  const answers = [
+    {
+      id: "a1",
+      text: "Paris",
+    },
+  ];
+
+  const question = new Question({
+    id: "q1",
+    text: "Capital?",
+    answers,
+    correct: ["a1"],
+  });
+
+  answers.push({
+    id: "a2",
+    text: "London",
+  });
+
+  assert.equal(question.answers.length, 1);
+});
+
+test("Question protects correct array from external mutation", () => {
+  const correct = ["a1"];
+
+  const question = new Question({
+    id: "q1",
+    text: "Capital?",
+    answers: [
+      {
+        id: "a1",
+        text: "Paris",
+      },
+    ],
+    correct,
+  });
+
+  correct.push("a2");
+
+  assert.deepEqual(question.correct, ["a1"]);
+});
+
+test("Question protects returned arrays from mutation", () => {
+  const question = new Question({
+    id: "q1",
+    text: "Capital?",
+    answers: [
+      {
+        id: "a1",
+        text: "Paris",
+      },
+    ],
+    correct: ["a1"],
+  });
+
+  const answers = question.answers;
+  const correct = question.correct;
+
+  answers.push(
+    new Answer({
+      id: "a2",
+      text: "London",
+    }),
+  );
+
+  correct.push("a2");
+
+  assert.equal(question.answers.length, 1);
+  assert.deepEqual(question.correct, ["a1"]);
+});
+
+test("Question protects metadata from external mutation", () => {
+  const metadata = {
+    category: "geography",
+  };
+
+  const question = new Question({
+    id: "q1",
+    text: "Capital?",
+    answers: [
+      {
+        id: "a1",
+        text: "Paris",
+      },
+    ],
+    correct: ["a1"],
+    metadata,
+  });
+
+  metadata.category = "changed";
+
+  assert.equal(question.metadata.category, "geography");
+});
+
+test("Question protects returned metadata from mutation", () => {
+  const question = new Question({
+    id: "q1",
+    text: "Capital?",
+    answers: [
+      {
+        id: "a1",
+        text: "Paris",
+      },
+    ],
+    correct: ["a1"],
+    metadata: {
+      category: "geography",
+    },
+  });
+
+  const metadata = question.metadata;
+
+  metadata.category = "changed";
+
+  assert.equal(question.metadata.category, "geography");
+});
+
+test("Question serialization returns independent data", () => {
+  const question = new Question({
+    id: "q1",
+    text: "Capital?",
+    answers: [
+      {
+        id: "a1",
+        text: "Paris",
+      },
+    ],
+    correct: ["a1"],
+  });
+
+  const json = question.toJSON();
+
+  json.answers.push({
+    id: "a2",
+    text: "London",
+    metadata: {},
+  });
+
+  json.correct.push("a2");
+
+  assert.equal(question.answers.length, 1);
+  assert.deepEqual(question.correct, ["a1"]);
+});

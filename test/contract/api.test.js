@@ -8,21 +8,10 @@ import Examination, {
   Summary,
   Score,
   ValidationError,
-
   normalize,
-  normalizeAnswer,
-  normalizeQuestion,
-
   validate,
-  validateAnswer,
-  validateQuestion,
-
   compare,
-  compareAnswer,
-
   evaluate,
-  evaluateCollection,
-
   summarize,
   score,
 } from "../../src/index.js";
@@ -39,29 +28,23 @@ test("public API exposes core models", () => {
   assert.equal(typeof Score, "function");
 });
 
-test("public API exposes normalization pipeline", () => {
+test("public API exposes normalization", () => {
   assert.equal(typeof normalize, "function");
-  assert.equal(typeof normalizeAnswer, "function");
-  assert.equal(typeof normalizeQuestion, "function");
 });
 
-test("public API exposes validation pipeline", () => {
+test("public API exposes validation", () => {
   assert.equal(typeof validate, "function");
-  assert.equal(typeof validateAnswer, "function");
-  assert.equal(typeof validateQuestion, "function");
 });
 
-test("public API exposes comparison pipeline", () => {
+test("public API exposes comparison", () => {
   assert.equal(typeof compare, "function");
-  assert.equal(typeof compareAnswer, "function");
 });
 
-test("public API exposes evaluation pipeline", () => {
+test("public API exposes evaluation", () => {
   assert.equal(typeof evaluate, "function");
-  assert.equal(typeof evaluateCollection, "function");
 });
 
-test("public API exposes summary and score pipeline", () => {
+test("public API exposes summary and score", () => {
   assert.equal(typeof summarize, "function");
   assert.equal(typeof score, "function");
 });
@@ -70,10 +53,10 @@ test("public API exposes ValidationError", () => {
   assert.equal(typeof ValidationError, "function");
 });
 
-test("default export is Examination", () => {
-  const examination = new Examination();
+test("default export is Examination", async () => {
+  const API = await import("../../src/index.js");
 
-  assert.ok(examination instanceof Examination);
+  assert.equal(API.default, Examination);
 });
 
 test("Examination exposes complete pipeline", () => {
@@ -121,4 +104,28 @@ test("Examination run returns complete execution result", () => {
   assert.equal(result.summary.correct, 1);
   assert.equal(result.score.points, 1);
   assert.equal(result.score.percentage, 100);
+});
+
+test("public API exports are locked", async () => {
+  const API = await import("../../src/index.js");
+
+  assert.deepEqual(
+    Object.keys(API).sort(),
+    [
+      "Answer",
+      "Examination",
+      "Question",
+      "Result",
+      "Score",
+      "Summary",
+      "ValidationError",
+      "compare",
+      "evaluate",
+      "normalize",
+      "score",
+      "summarize",
+      "validate",
+      "default",
+    ].sort(),
+  );
 });

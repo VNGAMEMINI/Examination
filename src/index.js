@@ -2,7 +2,6 @@ import Examination from "./examination/Examination.js";
 
 export { default as Answer } from "./answer/Answer.js";
 export { default as Question } from "./question/Question.js";
-
 export { default as Result } from "./result/Result.js";
 export { default as Summary } from "./summary/Summary.js";
 export { default as Score } from "./score/Score.js";

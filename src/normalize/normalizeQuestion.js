@@ -12,6 +12,7 @@ export default function normalizeQuestion(input, index = 0) {
       text: String(input ?? ""),
       answers: [],
       correct: [],
+      metadata: {},
     });
   }
 
@@ -21,15 +22,41 @@ export default function normalizeQuestion(input, index = 0) {
       )
     : [];
 
-  const correct = normalizeCorrect(input.correct, answers);
-
   return new Question({
-    id: input.id ?? `q${index}`,
-    text: input.text ?? "",
+    id: normalizeId(input.id, index),
+    text: normalizeText(input.text),
     answers,
-    correct,
-    metadata: input.metadata ?? {},
+    correct: normalizeCorrect(input.correct, answers),
+    metadata: normalizeMetadata(input.metadata),
   });
+}
+
+function normalizeId(id, index) {
+  if (id === undefined || id === null) {
+    return `q${index}`;
+  }
+
+  return String(id);
+}
+
+function normalizeText(text) {
+  if (text === undefined || text === null) {
+    return "";
+  }
+
+  return String(text);
+}
+
+function normalizeMetadata(metadata) {
+  if (
+    metadata === null ||
+    typeof metadata !== "object" ||
+    Array.isArray(metadata)
+  ) {
+    return {};
+  }
+
+  return { ...metadata };
 }
 
 function normalizeCorrect(correct, answers) {
