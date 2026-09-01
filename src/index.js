@@ -15,9 +15,18 @@ export { default as compare } from "./compare/compare.js";
 export { default as compareAnswer } from "./compare/compareAnswer.js";
 
 export { default as Result } from "./result/Result.js";
-export { default as evaluate } from "./evaluate/evaluate.js";
+export {
+  default as evaluate,
+  evaluateCollection,
+} from "./evaluate/evaluate.js";
 
 export { default as ValidationError } from "./errors/ValidationError.js";
+
+export { default as Summary } from "./summary/Summary.js";
+export { default as summarize } from "./summary/summarize.js";
+
+export { default as Score } from "./score/Score.js";
+export { default as score } from "./score/score.js";
 
 export { Examination };
 export default Examination;

@@ -15,11 +15,9 @@ function normalizeActual(actual) {
   return [String(actual)];
 }
 
-export default function evaluate(question, actual) {
+export function evaluate(question, actual) {
   if (!(question instanceof Question)) {
-    throw new TypeError(
-      "evaluate() requires a Question instance."
-    );
+    throw new TypeError("evaluate() requires a Question instance.");
   }
 
   validateQuestion(question);
@@ -30,20 +28,31 @@ export default function evaluate(question, actual) {
     return new Result({
       status: Result.STATUS.UNANSWERED,
       expected: question.correct,
-      actual: []
+      actual: [],
     });
   }
 
-  const correct = compare(
-    question,
-    normalizedActual
-  );
+  const correct = compare(question, normalizedActual);
 
   return new Result({
-    status: correct
-      ? Result.STATUS.CORRECT
-      : Result.STATUS.INCORRECT,
+    status: correct ? Result.STATUS.CORRECT : Result.STATUS.INCORRECT,
     expected: question.correct,
-    actual: normalizedActual
+    actual: normalizedActual,
   });
 }
+
+export function evaluateCollection(questions, answers = []) {
+  if (!Array.isArray(questions)) {
+    throw new TypeError(
+      "evaluateCollection() requires an array of Question instances.",
+    );
+  }
+
+  if (!Array.isArray(answers)) {
+    throw new TypeError("evaluateCollection() requires an array of answers.");
+  }
+
+  return questions.map((question, index) => evaluate(question, answers[index]));
+}
+
+export default evaluate;
