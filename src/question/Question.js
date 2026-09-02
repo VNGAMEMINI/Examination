@@ -7,21 +7,12 @@ export default class Question {
   #correct;
   #metadata;
 
-  constructor({
-    id,
-    text,
-    answers = [],
-    correct = [],
-    metadata = {}
-  }) {
+  constructor({ id, text, answers = [], correct = [], metadata = {} }) {
     this.#id = id;
     this.#text = text;
 
-    this.#answers = answers.map(
-      answer =>
-        answer instanceof Answer
-          ? answer
-          : new Answer(answer)
+    this.#answers = answers.map((answer) =>
+      answer instanceof Answer ? answer : new Answer(answer),
     );
 
     this.#correct = [...correct];
@@ -52,9 +43,9 @@ export default class Question {
     return {
       id: this.#id,
       text: this.#text,
-      answers: this.#answers.map(answer => answer.toJSON()),
+      answers: this.#answers.map((answer) => answer.toJSON()),
       correct: [...this.#correct],
-      metadata: { ...this.#metadata }
+      metadata: { ...this.#metadata },
     };
   }
 }

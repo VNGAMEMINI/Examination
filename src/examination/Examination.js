@@ -1,8 +1,6 @@
 import normalize from "../normalize/normalize.js";
 import validate from "../validate/validate.js";
-import evaluate, {
-  evaluateCollection,
-} from "../evaluate/evaluate.js";
+import evaluate, { evaluateCollection } from "../evaluate/evaluate.js";
 import summarize from "../summary/summarize.js";
 import score from "../score/score.js";
 
@@ -36,18 +34,15 @@ export default class Examination {
 
     this.validate(questions);
 
-    const results = this.evaluateCollection(
-      questions,
-      answers
-    );
+    const results = this.evaluateCollection(questions, answers);
 
     const summary = this.summary(results);
-    const score = this.score(summary);
+    const scoreResult = this.score(summary);
 
     return {
       results,
       summary,
-      score,
+      score: scoreResult,
     };
   }
 }

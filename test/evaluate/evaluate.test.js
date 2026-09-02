@@ -144,3 +144,33 @@ test("evaluate rejects invalid Question", () => {
     TypeError
   );
 });
+
+test("evaluate resolves answer text to answer id", () => {
+  const result = evaluate(
+    createQuestion(),
+    "Paris",
+  );
+
+  assert.equal(result.status, Result.STATUS.CORRECT);
+  assert.deepEqual(result.actual, ["a1"]);
+});
+
+test("evaluate resolves numeric actual id to string id", () => {
+  const result = evaluate(
+    createQuestion(),
+    1,
+  );
+
+  assert.equal(result.status, Result.STATUS.INCORRECT);
+  assert.deepEqual(result.actual, ["1"]);
+});
+
+test("evaluate removes duplicate actual answers", () => {
+  const result = evaluate(
+    createQuestion(["a1"]),
+    ["a1", "a1"],
+  );
+
+  assert.equal(result.status, Result.STATUS.CORRECT);
+  assert.deepEqual(result.actual, ["a1"]);
+});

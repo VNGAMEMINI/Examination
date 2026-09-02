@@ -1,12 +1,6 @@
-const STATUS = Object.freeze({
-  CORRECT: "correct",
-  INCORRECT: "incorrect",
-  UNANSWERED: "unanswered"
-});
+import Result from "../result/Result.js";
 
 export default class Summary {
-  static STATUS = STATUS;
-
   #total;
   #correct;
   #incorrect;
@@ -14,9 +8,7 @@ export default class Summary {
 
   constructor(results) {
     if (!Array.isArray(results)) {
-      throw new TypeError(
-        "Summary requires an array of Result instances."
-      );
+      throw new TypeError("Summary requires an array of Result instances.");
     }
 
     this.#total = results.length;
@@ -25,29 +17,25 @@ export default class Summary {
     this.#unanswered = 0;
 
     for (const result of results) {
-      if (!result || typeof result.status !== "string") {
-        throw new TypeError(
-          "Summary requires valid Result instances."
-        );
+      if (!(result instanceof Result)) {
+        throw new TypeError("Summary requires valid Result instances.");
       }
 
       switch (result.status) {
-        case STATUS.CORRECT:
+        case Result.STATUS.CORRECT:
           this.#correct++;
           break;
 
-        case STATUS.INCORRECT:
+        case Result.STATUS.INCORRECT:
           this.#incorrect++;
           break;
 
-        case STATUS.UNANSWERED:
+        case Result.STATUS.UNANSWERED:
           this.#unanswered++;
           break;
 
         default:
-          throw new TypeError(
-            `Unknown result status: ${result.status}`
-          );
+          throw new TypeError(`Unknown result status: ${result.status}`);
       }
     }
   }
@@ -73,7 +61,7 @@ export default class Summary {
       total: this.#total,
       correct: this.#correct,
       incorrect: this.#incorrect,
-      unanswered: this.#unanswered
+      unanswered: this.#unanswered,
     };
   }
 }

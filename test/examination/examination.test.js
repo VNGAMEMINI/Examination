@@ -260,3 +260,44 @@ test("Examination run supports unsupported root input", () => {
   assert.equal(result.score.points, 0);
   assert.equal(result.score.percentage, 0);
 });
+
+test("Examination run accepts normalized Question instances", () => {
+  const examination = new Examination();
+
+  const questions = [
+    createQuestion(),
+  ];
+
+  const result = examination.run(questions, ["a1"]);
+
+  assert.equal(result.results.length, 1);
+  assert.equal(result.results[0].status, Result.STATUS.CORRECT);
+  assert.equal(result.summary.correct, 1);
+  assert.equal(result.score.points, 1);
+  assert.equal(result.score.percentage, 100);
+});
+
+test("Examination run supports multiple correct answers", () => {
+  const examination = new Examination();
+
+  const result = examination.run(
+    [
+      {
+        id: "q1",
+        text: "Select all correct answers",
+        answers: [
+          { id: "a1", text: "A" },
+          { id: "a2", text: "B" },
+          { id: "a3", text: "C" },
+        ],
+        correct: ["a1", "a3"],
+      },
+    ],
+    [["a3", "a1"]],
+  );
+
+  assert.equal(result.results[0].status, Result.STATUS.CORRECT);
+  assert.equal(result.summary.correct, 1);
+  assert.equal(result.score.points, 1);
+  assert.equal(result.score.percentage, 100);
+});

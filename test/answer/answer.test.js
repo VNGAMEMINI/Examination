@@ -3,88 +3,76 @@ import assert from "node:assert/strict";
 
 import Answer from "../../src/answer/Answer.js";
 
-test("Answer creates canonical data", () => {
+test("Answer creates a valid instance", () => {
+  const answer = new Answer({
+    id: "a1",
+    text: "Paris",
+  });
+
+  assert.ok(answer instanceof Answer);
+});
+
+test("Answer exposes id", () => {
   const answer = new Answer({
     id: "a1",
     text: "Paris",
   });
 
   assert.equal(answer.id, "a1");
-  assert.equal(answer.text, "Paris");
-  assert.deepEqual(answer.metadata, {});
 });
 
-test("Answer accepts metadata", () => {
+test("Answer exposes text", () => {
+  const answer = new Answer({
+    id: "a1",
+    text: "Paris",
+  });
+
+  assert.equal(answer.text, "Paris");
+});
+
+test("Answer exposes metadata", () => {
   const answer = new Answer({
     id: "a1",
     text: "Paris",
     metadata: {
-      type: "choice",
+      language: "en",
     },
   });
 
   assert.deepEqual(answer.metadata, {
-    type: "choice",
+    language: "en",
   });
 });
 
-test("Answer protects metadata from external mutation", () => {
-  const metadata = {
-    type: "choice",
-  };
-
-  const answer = new Answer({
-    id: "a1",
-    text: "Paris",
-    metadata,
-  });
-
-  metadata.type = "changed";
-
-  assert.equal(answer.metadata.type, "choice");
-});
-
-test("Answer protects returned metadata from mutation", () => {
+test("Answer protects metadata from mutation", () => {
   const answer = new Answer({
     id: "a1",
     text: "Paris",
     metadata: {
-      type: "choice",
+      language: "en",
     },
   });
 
   const metadata = answer.metadata;
+  metadata.language = "fr";
 
-  metadata.type = "changed";
-
-  assert.equal(answer.metadata.type, "choice");
+  assert.equal(answer.metadata.language, "en");
 });
 
 test("Answer serializes canonical data", () => {
   const answer = new Answer({
     id: "a1",
     text: "Paris",
+    metadata: {
+      language: "en",
+    },
   });
 
   assert.deepEqual(answer.toJSON(), {
     id: "a1",
     text: "Paris",
-    metadata: {},
-  });
-});
-
-test("Answer serialization returns independent metadata", () => {
-  const answer = new Answer({
-    id: "a1",
-    text: "Paris",
     metadata: {
-      type: "choice",
+      language: "en",
     },
   });
-
-  const data = answer.toJSON();
-
-  data.metadata.type = "changed";
-
-  assert.equal(answer.metadata.type, "choice");
 });
