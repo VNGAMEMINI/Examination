@@ -1,84 +1,233 @@
 # Data Pipeline
 
-Examination xử lý dữ liệu theo pipeline:
+## Pipeline
+
+Examination xử lý dữ liệu theo một flow thống nhất:
 
 ```text
-Raw Input
-   │
-   ▼
-Parser
-   │
-   ▼
-Normalizer
-   │
-   ▼
-Validator
-   │
-   ▼
-Internal Model
-   │
-   ▼
-Examination / Session
+INPUT
+  ↓
+NORMALIZE
+  ↓
+VALIDATE
+  ↓
+EVALUATE
+  ↓
+RESULT
+  ↓
+SUMMARY
+  ↓
+SCORE
 ```
 
-## 1. Raw Input
+## 1. Input
 
-Người tạo đề có thể dùng tên ngắn:
+Input là dữ liệu do consumer cung cấp.
+
+Ví dụ:
 
 ```js
 {
-  q: "We ........ from the USA.",
-  a: ["is", "are", "being", "be"],
-  c: 1
-}
-```
-
-hoặc tên rõ nghĩa:
-
-```js
-{
-  question: "We ........ from the USA.",
-  answers: ["is", "are", "being", "be"],
-  correct: 1
+  questions: [
+    {
+      id: "q1",
+      text: "Capital of France?",
+      answers: [
+        { id: "a1", text: "Paris" },
+        { id: "a2", text: "London" }
+      ],
+      correct: "a1"
+    }
+  ]
 }
 ```
 
 ## 2. Normalize
 
-Normalizer biến chúng thành một format chuẩn.
-
 ```js
-{
-  question: "We ........ from the USA.",
-  answers: ["is", "are", "being", "be"],
-  correct: 1
-}
+const questions = exam.normalize(input);
 ```
 
-Sau bước này, các phần còn lại của Examination chỉ làm việc với format chuẩn.
+Normalizer chuyển dữ liệu thành các `Question` instance.
+
+Ví dụ:
+
+```text
+raw object
+   ↓
+Question
+   ├── Answer
+   ├── Answer
+   └── correct
+```
+
+Normalization không thực hiện scoring hoặc evaluation.
 
 ## 3. Validate
 
-Validator kiểm tra:
-
-- `question` có hợp lệ không
-- `answers` có tồn tại không
-- `answers` có đúng cấu trúc không
-- `correct` có trỏ tới đáp án hợp lệ không
-- `type` có được hỗ trợ không
-
-## 4. Internal Model
-
-Internal Model không phụ thuộc vào cách người viết đề đặt tên field.
-
-```text
-Input aliases
-      │
-      ▼
-  Normalizer
-      │
-      ▼
-Internal Model
+```js
+exam.validate(questions);
 ```
 
-Đây là nguyên tắc quan trọng để Examination có thể hỗ trợ nhiều format dữ liệu trong tương lai.
+Validation chỉ nhận canonical model.
+
+Các vấn đề về:
+
+* Question type
+* Answer type
+* empty id
+* duplicate answer id
+* unknown correct answer
+
+được phát hiện ở bước này.
+
+Invalid data tạo `ValidationError`.
+
+## 4. Evaluate
+
+```js
+const result = exam.evaluate(question, actual);
+```
+
+Evaluate xử lý một Question.
+
+```text
+Question
+   +
+Actual
+   ↓
+Evaluate
+   ↓
+Result
+```
+
+Actual answer có thể được resolve từ answer ID hoặc answer text.
+
+## 5. Evaluate Collection
+
+```js
+const results = exam.evaluateCollection(
+  questions,
+  answers
+);
+```
+
+Mỗi Question tương ứng với một actual answer.
+
+Nếu answer không tồn tại tại index tương ứng, Question được đánh giá là `unanswered`.
+
+## 6. Summary
+
+```js
+const summary = exam.summary(results);
+```
+
+Summary tổng hợp:
+
+```text
+Result[]
+   ↓
+Summary
+```
+
+## 7. Score
+
+```js
+const score = exam.score(summary);
+```
+
+Score được tính từ số câu đúng và tổng số câu.
+
+```text
+Summary
+ ├── correct
+ └── total
+       ↓
+     Score
+```
+
+## 8. Complete Flow
+
+```js
+const result = exam.run(input, answers);
+```
+
+Tương đương về mặt xử lý với:
+
+```js
+const questions = exam.normalize(input);
+
+exam.validate(questions);
+
+const results = exam.evaluateCollection(
+  questions,
+  answers
+);
+
+const summary = exam.summary(results);
+
+const score = exam.score(summary);
+```
+
+Kết quả:
+
+```js
+{
+  results,
+  summary,
+  score
+}
+```
+
+## Pipeline Invariants
+
+Các nguyên tắc phải được giữ:
+
+```text
+Normalize → Validate
+```
+
+Không đảo ngược hai bước.
+
+```text
+Evaluate → Result
+```
+
+Evaluate không trả UI state.
+
+```text
+Result[] → Summary
+```
+
+Summary không tự đánh giá câu trả lời.
+
+```text
+Summary → Score
+```
+
+Score không tự chấm lại Question.
+
+## Consumer Boundary
+
+Consumer chịu trách nhiệm cho:
+
+```text
+UI
+Navigation
+Timer
+Randomization
+Application State
+Session
+```
+
+Examination chịu trách nhiệm cho:
+
+```text
+Normalization
+Validation
+Evaluation
+Comparison
+Result
+Summary
+Score
+```

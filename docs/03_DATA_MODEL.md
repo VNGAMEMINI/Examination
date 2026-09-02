@@ -1,99 +1,210 @@
 # Data Model
 
-## Exam
+## Canonical Model
 
-```js
-{
-  meta: {
-    id: "english-test",
-    name: "English Test",
-    version: "1.0.0"
-  },
+Examination sử dụng một representation thống nhất sau normalization.
 
-  settings: {},
-
-  subjects: []
-}
+```text
+Question
+ ├── id
+ ├── text
+ ├── answers[]
+ ├── correct[]
+ └── metadata
 ```
 
-## Subject
+Mỗi Answer:
+
+```text
+Answer
+ ├── id
+ ├── text
+ └── metadata
+```
+
+## Answer
 
 ```js
-{
-  id: "english",
-  name: "Tiếng Anh",
-  questions: []
-}
+new Answer({
+  id: "a1",
+  text: "Paris",
+  metadata: {},
+});
 ```
+
+Properties:
+
+```text
+id        string
+text      string
+metadata  object
+```
+
+`Answer` bảo vệ dữ liệu nội bộ khỏi mutation trực tiếp.
 
 ## Question
 
 ```js
-{
-  id: "en-001",
-  type: "single",
-
-  content: {
-    text: "We ........ from the USA.",
-    image: null
-  },
-
+new Question({
+  id: "q1",
+  text: "Capital of France?",
   answers: [
-    "is",
-    "are",
-    "being",
-    "be"
+    {
+      id: "a1",
+      text: "Paris",
+    },
+    {
+      id: "a2",
+      text: "London",
+    },
   ],
-
-  correct: 1
-}
+  correct: ["a1"],
+  metadata: {},
+});
 ```
 
-## Input alias và Internal Model
+Properties:
 
-Input:
+```text
+id        string
+text      string
+answers   Answer[]
+correct   string[]
+metadata  object
+```
+
+## Answer Identity
+
+`id` là identity của Answer.
+
+Ví dụ:
 
 ```js
 {
-  q: "...",
-  a: ["A", "B", "C"],
-  c: 1
+  id: "a1",
+  text: "Paris"
 }
 ```
 
-Internal:
+Text có thể được sử dụng để resolve actual answer trong evaluation, nhưng canonical result sử dụng Answer ID.
+
+## Multiple Correct Answers
+
+Question có thể có nhiều đáp án đúng:
+
+```js
+correct: ["a1", "a3"];
+```
+
+Compare không phụ thuộc thứ tự:
+
+```text
+["a1", "a3"]
+=
+["a3", "a1"]
+```
+
+## Result
+
+Result đại diện cho một lần đánh giá:
 
 ```js
 {
-  question: "...",
-  answers: ["A", "B", "C"],
-  correct: 1
+  status: "correct",
+  expected: ["a1"],
+  actual: ["a1"],
+  correct: true
 }
 ```
 
-`a` là cách viết input.
+Status hợp lệ:
 
-`answers` là tên chuẩn trong Internal Model.
+```text
+correct
+incorrect
+unanswered
+```
 
-## Answer identity
+## Summary
 
-Khi hệ thống cần random đáp án, index hiển thị có thể thay đổi.
-
-Vì vậy về lâu dài Answer nên có identity riêng:
+Summary tổng hợp Result:
 
 ```js
 {
-  id: "a2",
-  text: "are"
+  total: 10,
+  correct: 7,
+  incorrect: 2,
+  unanswered: 1
 }
 ```
 
-và đáp án đúng có thể tham chiếu bằng ID:
+## Score
+
+Score được tạo từ Summary:
 
 ```js
-correct: ["a2"]
+{
+  points: 7,
+  percentage: 70
+}
 ```
 
-Normalizer có thể chuyển format index-based của input sang identity-based Internal Model.
+## Serialization
 
-Điều này giúp random không làm mất đáp án đúng.
+Các model hỗ trợ `toJSON()` để tạo canonical plain data.
+
+Ví dụ:
+
+```js
+question.toJSON();
+result.toJSON();
+summary.toJSON();
+score.toJSON();
+```
+
+## Data Protection
+
+Các collection getter trả về bản sao thay vì cho phép mutation trực tiếp internal state.
+
+Ví dụ:
+
+```js
+question.answers;
+question.correct;
+question.metadata;
+```
+
+Consumer không nên dựa vào việc mutate trực tiếp model.
+
+## Model Flow
+
+```text
+Answer
+   │
+   ▼
+Question
+   │
+   ▼
+Evaluate
+   │
+   ▼
+Result
+   │
+   ▼
+Summary
+   │
+   ▼
+Score
+```
+
+## Scope
+
+Data model hiện tại tập trung vào:
+
+- Question
+- Answer
+- Result
+- Summary
+- Score
+
+Các khái niệm như Session, timer, navigation hoặc UI state không phải canonical model của core hiện tại.

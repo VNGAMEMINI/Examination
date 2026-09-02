@@ -1,66 +1,52 @@
 # Session
 
-## Mục đích
+## Scope
 
-`Session` đại diện cho một lần làm bài.
+`Session` không thuộc core API của `@vngamemini/examination` 0.1.x.
 
-```js
-const exam = new Examination(data)
-
-const session = exam.createSession({
-  candidate: "Nguyen Van A"
-})
-```
-
-## Examination và Session
+Examination chỉ xử lý dữ liệu examination thông qua processing pipeline:
 
 ```text
-Examination
-   │
-   ├── Session A
-   ├── Session B
-   └── Session C
+INPUT
+  ↓
+NORMALIZE
+  ↓
+VALIDATE
+  ↓
+EVALUATE
+  ↓
+SUMMARY
+  ↓
+SCORE
 ```
 
-Examination chứa đề và cấu hình.
+## Application Responsibility
 
-Session chứa trạng thái của một người đang làm bài.
+Một application có thể xây dựng session layer bên ngoài Examination để quản lý:
 
-## Session data
+- trạng thái bài làm;
+- câu hỏi hiện tại;
+- lựa chọn của người dùng;
+- tiến trình làm bài;
+- bắt đầu và kết thúc phiên;
+- chuyển câu hỏi;
+- lưu dữ liệu tạm thời;
+- submit bài làm.
 
-Một Session có thể quản lý:
+Application có thể sử dụng Examination để xử lý dữ liệu khi cần.
 
-- candidate
-- current question
-- user answers
-- start time
-- remaining time
-- state
-- answer results
-- final result
-
-## Trả lời
-
-```js
-const result = session.answer(1)
-```
-
-`answer()` xử lý một câu và có thể trả kết quả ngay.
-
-## Submit
-
-```js
-const result = session.submit()
-```
-
-`submit()` hoàn tất bài và tạo ExamResult.
-
-## Không trộn answer và submit
+Dependency phải giữ:
 
 ```text
-answer()
-  = xử lý một câu
-
-submit()
-  = hoàn tất toàn bộ bài
+Application Session
+        ↓
+   Examination
 ```
+
+Không đưa session lifecycle vào Examination core.
+
+## Future Integration
+
+Nếu sau này cần một session abstraction chính thức, nó phải được thiết kế như một layer mới bên ngoài core processing hiện tại.
+
+Việc bổ sung session không được làm thay đổi processing contract hiện tại nếu không có yêu cầu version rõ ràng.

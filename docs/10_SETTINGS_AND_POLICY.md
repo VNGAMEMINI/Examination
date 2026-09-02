@@ -1,92 +1,136 @@
-# Settings & Policy
+# Settings and Policy
 
-## Settings
+## Status
 
-Settings mô tả cách một bài kiểm tra hoạt động.
+**Out of Core / Consumer Responsibility**
 
-Ví dụ:
+Examination 0.1.x không có một settings/policy system tổng quát.
+
+## Core API
+
+Core hiện tại không yêu cầu:
 
 ```js
 {
-  mode: "exam",
-
-  question: {
-    limit: 20
-  },
-
-  random: {
-    question: true,
-    answer: true
-  },
-
-  navigation: {
-    autoNext: true
-  },
-
-  time: {
-    total: 2700,
-    perQuestion: 60
-  }
+  mode,
+  random,
+  navigation,
+  time,
+  policy
 }
 ```
 
-## Các nhóm setting
+để thực hiện evaluation.
 
-### Candidate
+Flow chính vẫn là:
 
-Tên thí sinh hoặc thông tin session.
+```text id="c9v4m2"
+input
+  ↓
+normalize
+  ↓
+validate
+  ↓
+evaluate
+  ↓
+summary
+  ↓
+score
+```
 
-### Question
+## Consumer Settings
 
-Giới hạn số câu.
+Application có thể có settings riêng:
 
-### Random
+```js id="s7n3k5"
+{
+  randomQuestions: true,
+  randomAnswers: true,
+  autoNext: true,
+  timeLimit: 45
+}
+```
 
-- random question
-- random answer
+Những settings này không thuộc canonical Examination model.
 
-### Navigation behavior
+## Vì sao không đưa Settings vào Core
 
-- auto next
-- cho phép quay lại
-- các policy khác
-
-### Time
-
-- total time
-- per-question time
-
-### Mode
+Các ứng dụng khác nhau có nhu cầu khác nhau.
 
 Ví dụ:
 
-- free
-- exam
-- practice
-- custom
+```text id="n4x8p1"
+Practice
+ ├── random: false
+ ├── timer: false
+ └── autoNext: true
 
-## Mode và Policy
-
-Không nên rải:
-
-```js
-if (mode === "exam") ...
+Exam
+ ├── random: true
+ ├── timer: true
+ └── autoNext: false
 ```
 
-khắp core.
+Đây là application policy, không phải data-processing requirement.
 
-Thay vào đó:
+## Policy
 
-```text
-Mode
+Không tạo các abstraction như:
+
+```text id="u6q2m8"
+Các policy abstraction dành cho timer, randomization,
+navigation hoặc application mode không thuộc core hiện tại.
+```
+
+trong core hiện tại.
+
+Chỉ thêm policy abstraction khi có nhiều behavior thực sự cần được thay thế hoặc mở rộng.
+
+## Mode
+
+Các mode như:
+
+```text id="p3f7k1"
+free
+exam
+practice
+```
+
+có thể được consumer sử dụng.
+
+Examination không cần biết mode để evaluate một Question.
+
+## Boundary
+
+```text id="b8m5r2"
+Consumer
   │
-  ▼
-Policy
-  ├── AnswerPolicy
-  ├── TimePolicy
-  ├── NavigationPolicy
-  ├── RandomPolicy
-  └── ResultPolicy
+  ├── Settings
+  ├── Policies
+  ├── Mode
+  ├── Navigation
+  └── Time
+       │
+       ▼
+Examination
+  │
+  ├── Normalize
+  ├── Validate
+  ├── Evaluate
+  ├── Summary
+  └── Score
 ```
 
-Nhờ vậy có thể thêm mode mới mà không phá core.
+## Future Extension
+
+Nếu một setting thực sự làm thay đổi core processing behavior, cần xác định chính xác nó ảnh hưởng layer nào.
+
+Không đưa toàn bộ application settings vào `Examination`.
+
+## Nguyên tắc
+
+Settings mô tả cách application vận hành.
+
+Examination mô tả cách dữ liệu được xử lý.
+
+Hai khái niệm phải được giữ độc lập.

@@ -1,79 +1,148 @@
-# Time & Random
+# Time and Random
+
+## Status
+
+**Out of Core / Consumer Responsibility**
+
+`Time` và `Random` không phải core services của Examination 0.1.x.
 
 ## Time
 
-Time là service xử lý thời gian, không phải timer UI.
+Examination không quản lý:
 
-```text
-Examination Time
-       │
-       ├── total time
-       └── question time
+* countdown
+* duration
+* timeout
+* start time
+* end time
+* pause
+* resume
+
+Evaluation không cần biết thời gian để xác định:
+
+```text id="m2x8c5"
+Question
++
+Actual
+→
+Result
 ```
-
-Check chỉ hiển thị:
-
-```text
-44:59
-```
-
-Examination quản lý giá trị và trạng thái thời gian.
-
-## Total time
-
-```js
-time.total = 2700
-```
-
-45 phút.
-
-Khi hết thời gian, Session có thể chuyển sang trạng thái kết thúc theo policy.
-
-## Per-question time
-
-```js
-time.perQuestion = 60
-```
-
-Mỗi câu có giới hạn riêng.
 
 ## Random
 
-Random là service hỗ trợ Session.
+Examination không randomize:
 
-```text
+* question order
+* answer order
+* question selection
+* question pool
+
+Normalizer phải tạo canonical data ổn định.
+
+Compare phải deterministic.
+
+Evaluate phải deterministic.
+
+## Vì sao tách Time
+
+Timer là lifecycle concern.
+
+Ví dụ:
+
+```text id="q5r9n1"
+Timer
+  ↓
+Application State
+  ↓
 Session
- ├── Random Question
- └── Random Answer
+  ↓
+Examination
 ```
 
-### Random question
+Examination chỉ nhận dữ liệu cần đánh giá.
 
-```text
-1 2 3 4 5
-↓
-3 1 5 2 4
+## Vì sao tách Random
+
+Randomization nên xảy ra trước processing hoặc ở application layer.
+
+Ví dụ:
+
+```text id="x7k3m6"
+Question Pool
+     ↓
+Randomizer
+     ↓
+Selected Questions
+     ↓
+Examination
 ```
 
-### Random answer
+Examination không cần biết selection được tạo bằng cách nào.
 
-```text
-A B C D
-↓
-C A D B
+## Deterministic Core
+
+Một input và actual giống nhau phải tạo kết quả evaluation giống nhau.
+
+```text id="a9v2c4"
+Question + Actual
+       ↓
+    Evaluate
+       ↓
+     Result
 ```
 
-Điều bắt buộc:
+Không nên có random behavior ẩn bên trong pipeline này.
 
-> Random không được làm mất identity của đáp án đúng.
+## Consumer Example
 
-Nếu Answer dùng ID:
+Application có thể làm:
 
-```js
-{
-  id: "a2",
-  text: "are"
-}
+```js id="h4p8s2"
+const questions = randomize(questionPool);
+
+const result = exam.run(
+  { questions },
+  answers
+);
 ```
 
-thì thứ tự hiển thị có thể thay đổi nhưng `a2` vẫn là đáp án đúng.
+Randomization xảy ra bên ngoài Examination.
+
+## Time Example
+
+Application có thể kiểm tra timeout trước khi submit:
+
+```text id="w6n1q9"
+Timer
+  ↓
+Application
+  ↓
+answers
+  ↓
+Examination
+```
+
+Examination không cần sở hữu timer.
+
+## Future Package
+
+Nếu Time hoặc Random trở thành reusable systems, chúng có thể tồn tại dưới dạng package/module riêng.
+
+```text id="c8m4y7"
+Application
+ ├── Time
+ ├── Random
+ └── Examination
+```
+
+Không import trực tiếp các module này vào core chỉ để cung cấp convenience API.
+
+## Nguyên tắc
+
+```text id="f2r7k5"
+Time   → lifecycle
+Random → selection
+Examination → data processing
+```
+
+Giữ ba trách nhiệm độc lập giúp core dễ kiểm thử và mở rộng.

@@ -1,68 +1,113 @@
-# State & Events
+# State and Events
 
-## State
+## Status
 
-Session cần có trạng thái rõ ràng.
+**Out of Core / Future Scope**
 
-```text
+Examination 0.1.x không cung cấp state machine hoặc event system.
+
+## Core Behavior
+
+Examination thực hiện processing đồng bộ:
+
+```text id="z6c1p4"
+Input
+  ↓
+normalize()
+  ↓
+validate()
+  ↓
+evaluate()
+  ↓
+summary()
+  ↓
+score()
+```
+
+`run()` trả về execution result.
+
+```js id="p8w4r2"
+const result = exam.run(input, answers);
+```
+
+Không có lifecycle:
+
+```text id="q5m9x1"
 READY
-  │
-  ▼
 RUNNING
-  │
-  ├── PAUSED
-  │      │
-  │      ▼
-  │   RUNNING
-  │
-  ▼
+PAUSED
 SUBMITTED
-  │
-  ▼
 FINISHED
 ```
 
-Các state có thể được mở rộng tùy thiết kế API.
+## Không có Event API
 
-## Vì sao cần State?
+Examination không cung cấp:
 
-Check không phải tự suy đoán:
-
-```js
-if (session.state === "finished") {
-  // render result
-}
+```js id="k2v7n3"
+Examination không cung cấp event emitter hoặc lifecycle event API.
 ```
 
-Examination là nguồn sự thật về trạng thái Session.
+Examination không phát lifecycle events.
 
-## Events
+Các event như thay đổi câu hỏi, thay đổi câu trả lời,
+thay đổi thời gian hoặc thay đổi trạng thái phiên thuộc
+application/session layer.
 
-Examination có thể phát event để consumer biết có thay đổi.
+## Vì sao
+
+Event system phù hợp với application/UI lifecycle.
 
 Ví dụ:
 
-```js
-session.on("answer", callback)
-session.on("questionChanged", callback)
-session.on("time", callback)
-session.on("state", callback)
-session.on("finish", callback)
-```
-
-Event chỉ thông báo dữ liệu hoặc trạng thái.
-
-Event không render UI.
-
-## Check
-
-```text
+```text id="a3f8q6"
+User
+  ↓
+UI
+  ↓
+Application State
+  ↓
+Session
+  ↓
 Examination
-    │
-    │ event
-    ▼
-  Check
-    │
-    ▼
- render UI
 ```
+
+Examination chỉ cần xử lý dữ liệu khi được yêu cầu.
+
+## Future State Layer
+
+Nếu cần state management, có thể xây dựng ở consumer:
+
+```text id="h7m2v9"
+Application State
+      │
+      ├── currentQuestion
+      ├── answers
+      ├── status
+      └── time
+             │
+             ▼
+       Examination
+```
+
+Examination không cần biết state đó đến từ đâu.
+
+## Future Events
+
+Nếu một package Session được xây dựng trong tương lai, event system có thể thuộc package đó.
+
+Ví dụ:
+
+```text id="r4n8c2"
+Session
+  ├── state
+  └── events
+```
+
+Không thêm event system vào Examination chỉ vì Session cần nó.
+
+## Nguyên tắc
+
+State và Events thuộc lifecycle/application layer.
+
+Examination chỉ chịu trách nhiệm xử lý dữ liệu.

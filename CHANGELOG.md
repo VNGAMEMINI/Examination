@@ -1,42 +1,54 @@
 # Changelog
 
-All notable changes to `@vngamemini/examination` are documented in this file.
+All notable changes to `@vngamemini/examination` are documented here.
 
-## [0.1.0] - 2026-08-29
+## [0.1.0] - 2026-09-02
 
 ### Added
 
-- Examination data model.
-- Subject and Question collections.
-- Answer and multiple-answer support.
+- `Answer` data model.
+- `Question` data model.
+- `Result` data model.
+- `Summary` data model.
+- `Score` data model.
 - Input normalization pipeline.
-- Data validation API.
-- Examination evaluation.
-- Subject and Question evaluation.
-- Score and Result models.
-- Examination Session.
-- Session navigation.
-- Session timer.
-- Session serialization and restoration.
-- Random question selection.
-- Configurable examination settings.
-- Extensible question types.
-- Compare utilities.
-- Public package API.
-- Public API / model contract tests.
-- Consumer integration verification.
-- Documentation for architecture, models, normalization, validation, evaluation and session behavior.
+- Question and answer validation.
+- Answer comparison.
+- Question evaluation.
+- Result summarization.
+- Score calculation.
+- `Examination` processing facade.
+- Public functional API.
+- `ValidationError`.
+- Contract tests for the public API.
+- Architecture and processing documentation.
 
-### Verification
+### Architecture
 
-- 425 tests passing.
-- Public API contract passing.
-- Consumer integration passing.
-- Package tarball verified with `npm pack`.
-- Package contents verified.
-- Internal source imports blocked through package `exports`.
-- `@vngamemini/examination@0.1.0` package metadata verified.
+The package uses a single processing pipeline:
 
-### Release
+```text
+INPUT
+  ↓
+NORMALIZE
+  ↓
+VALIDATE
+  ↓
+EVALUATE
+  ├── COMPARE
+  └── RESULT
+  ↓
+SUMMARY
+  ↓
+SCORE
+```
 
-- Git tag: `v0.1.0`
+### Scope
+
+The package focuses on examination data processing.
+
+Application-level responsibilities remain outside the core, including user interface, navigation, timing, randomization, events, persistence, routing, and rendering.
+
+### Stability
+
+`0.1.0` establishes the initial public API and core processing contract.

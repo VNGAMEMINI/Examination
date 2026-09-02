@@ -2,119 +2,227 @@
 
 ## Tổng quan
 
+Examination sử dụng kiến trúc xử lý dữ liệu tuyến tính.
+
 ```text
-                         Examination
-                              │
-              ┌───────────────┼───────────────┐
-              │               │               │
-             Data          Settings          Model
-              │               │               │
-      Parser/Normalize     Policy      Subject/Question
-          Validator                     /Answer
-              │               │               │
-              └───────────────┼───────────────┘
-                              │
-                           Session
-                              │
-                 ┌────────────┼────────────┐
-                 │            │            │
-               Random        Time         State
-                 │            │            │
-                 └────────────┼────────────┘
-                              │
-                         User Answer
-                              │
-                              ▼
-                           Type
-                              │
-                              ▼
-                           Compare
-                              │
-                              ▼
-                      AnswerResult
-                              │
-                              ▼
-                            Score
-                              │
-                              ▼
-                         ExamResult
-                              │
-                              ▼
-                            Check
+INPUT
+  │
+  ▼
+NORMALIZE
+  │
+  ▼
+VALIDATE
+  │
+  ▼
+EVALUATE
+  │
+  ▼
+RESULT
+  │
+  ▼
+SUMMARY
+  │
+  ▼
+SCORE
 ```
 
-## Các lớp logic chính
+Mục tiêu là giữ mỗi bước có một trách nhiệm rõ ràng.
 
-### Data
+## Layers
 
-Tiếp nhận dữ liệu đầu vào.
+### Input
 
-### Parser
+Input có thể ở nhiều dạng.
 
-Chuyển dữ liệu dạng string thành JavaScript data khi cần.
+Consumer không cần tạo trực tiếp Internal Model trước khi đưa dữ liệu vào Examination.
 
-### Normalizer
+### Normalize
 
-Chuyển nhiều cách viết input về một Internal Model thống nhất.
+Normalizer chuyển input về representation chuẩn.
 
-Ví dụ:
-
-```js
-{
-  q: "2 + 2 = ?",
-  a: ["3", "4", "5"],
-  c: 1
-}
+```text
+Flexible Input
+      │
+      ▼
+  Normalizer
+      │
+      ▼
+Canonical Model
 ```
 
-được chuẩn hóa thành:
+Canonical model gồm:
 
-```js
-{
-  question: "2 + 2 = ?",
-  answers: ["3", "4", "5"],
-  correct: 1
-}
+```text
+Question
+ ├── id
+ ├── text
+ ├── answers
+ ├── correct
+ └── metadata
 ```
 
-### Validator
+### Validate
 
-Chỉ kiểm tra Internal Model sau khi Normalize.
+Validator kiểm tra canonical model.
 
-### Model
+```text
+Canonical Model
+      │
+      ▼
+   Validator
+      │
+      ├── valid
+      │
+      └── ValidationError
+```
 
-Đại diện cho:
+Validator không có nhiệm vụ parse hoặc chuẩn hóa input.
 
-- Examination
-- Subject
-- Question
-- Answer
+### Evaluate
 
-### Session
+Evaluate nhận `Question` và actual answer.
 
-Đại diện cho một lần làm bài cụ thể.
+```text
+Question
+   │
+   ├── expected
+   │
+   ▼
+Evaluate
+   ▲
+   │
+actual answer
+```
+
+Evaluate:
+
+1. kiểm tra Question
+2. chuẩn hóa actual answer
+3. resolve answer identity
+4. gọi Compare
+5. tạo Result
 
 ### Compare
 
-Chỉ tập trung vào việc đánh giá Answer.
+Compare chỉ xác định expected và actual có tương đương hay không.
 
-### Score
+```text
+Expected ─┐
+          ├── Compare ──> boolean
+Actual ───┘
+```
 
-Tổng hợp kết quả thành điểm.
+Compare không quản lý application state.
 
 ### Result
 
-Chứa dữ liệu kết quả, không render UI.
+Evaluate tạo `Result`.
 
-## Nguyên tắc Session
+```text
+Evaluate
+   │
+   ▼
+Result
+```
 
-Một Examination có thể tạo nhiều Session:
+Result chỉ chứa dữ liệu kết quả.
+
+### Summary
+
+Các Result được tổng hợp:
+
+```text
+Result[]
+   │
+   ▼
+Summary
+```
+
+Summary cung cấp:
+
+```text
+total
+correct
+incorrect
+unanswered
+```
+
+### Score
+
+Score được tính từ Summary:
+
+```text
+Summary
+   │
+   ▼
+Score
+```
+
+Score hiện tại cung cấp:
+
+```text
+points
+percentage
+```
+
+## Examination Facade
+
+`Examination` là interface cấp cao cho các bước xử lý.
 
 ```text
 Examination
- ├── Session A
- ├── Session B
- └── Session C
+ ├── normalize()
+ ├── validate()
+ ├── evaluate()
+ ├── evaluateCollection()
+ ├── summary()
+ ├── score()
+ └── run()
 ```
 
-Đề gốc không được biến thành trạng thái của một người dùng cụ thể.
+`run()` nối các bước thành một execution flow thống nhất.
+
+## Dependency Direction
+
+```text
+Consumer
+   │
+   ▼
+Examination
+   │
+   ├── Normalize
+   ├── Validate
+   ├── Evaluate
+   ├── Summary
+   └── Score
+```
+
+Examination không phụ thuộc vào UI consumer.
+
+## Ngoài phạm vi
+
+Không đưa các hệ thống sau vào core chỉ vì consumer có nhu cầu:
+
+```text
+Time
+Random
+Navigation
+Session
+UI State
+Rendering
+React
+DOM
+```
+
+Các chức năng này thuộc application layer hoặc consumer.
+
+## Nguyên tắc mở rộng
+
+Khi thêm functionality:
+
+1. xác định functionality có thuộc data processing hay không
+2. nếu thuộc core, đặt nó vào đúng pipeline layer
+3. không tạo abstraction chỉ để giải quyết một trường hợp đơn giản
+4. giữ public API nhỏ
+5. giữ canonical model ổn định
+6. bổ sung test trước khi mở rộng behavior

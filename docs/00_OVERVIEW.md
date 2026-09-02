@@ -1,60 +1,190 @@
-# Examination — Overview
+# Examination Overview
 
 ## Mục đích
 
-`Examination` là thư viện JavaScript chuyên xử lý dữ liệu và logic cho các hệ thống làm bài, kiểm tra, luyện tập và đánh giá.
+Examination là thư viện JavaScript xử lý dữ liệu và logic đánh giá cho các hệ thống:
 
-Examination **không phải UI library** và không chịu trách nhiệm render giao diện.
+* examination
+* quiz
+* practice
+* assessment
+
+Examination tập trung vào **data processing**, không phụ trách giao diện hoặc vòng đời UI.
+
+## Core Pipeline
 
 ```text
-Question Data
-      │
-      ▼
-  Examination
-      │
-      ├── Normalize
-      ├── Validate
-      ├── Question / Answer
-      ├── Compare
-      ├── Score
-      ├── Time
-      ├── Random
-      ├── Session
-      └── Result
-      │
-      ▼
-   Consumer
-      │
-      └── Check / React / Vue / Vanilla JS / ...
+INPUT
+  ↓
+NORMALIZE
+  ↓
+VALIDATE
+  ↓
+EVALUATE
+  ↓
+RESULT
+  ↓
+SUMMARY
+  ↓
+SCORE
 ```
 
-## Examination và Check
+Trong quá trình `EVALUATE`, Examination sử dụng `COMPARE` để xác định câu trả lời có chính xác hay không.
 
-| Thành phần | Trách nhiệm |
-|---|---|
-| Examination | Xử lý dữ liệu, logic và trạng thái |
-| Check | Giao diện web sử dụng Examination |
+```text
+Question + Actual Answer
+          │
+          ▼
+       Evaluate
+          │
+          ├── Compare
+          │
+          ▼
+        Result
+```
 
-Examination không chứa:
+## Core Models
 
-- HTML
-- CSS
-- React components
-- Vue components
-- DOM manipulation
-- Question UI
-- Answer UI
-- Navigation UI
+```text
+Answer
+   │
+   ▼
+Question
+   │
+   ▼
+Result
+   │
+   ▼
+Summary
+   │
+   ▼
+Score
+```
 
-Check có thể thay đổi giao diện mà không phải thay đổi logic chấm bài.
+### Answer
 
-## Nguyên tắc cốt lõi
+Đại diện cho một đáp án chuẩn hóa.
 
-1. Input có thể linh hoạt.
-2. Internal Model phải thống nhất.
-3. Core chỉ xử lý dữ liệu.
-4. API phải nhất quán.
-5. Question Type quyết định cách đánh giá Answer.
-6. `answer()` đánh giá một câu.
-7. `submit()` hoàn tất một Session.
-8. Kết quả của một câu và kết quả toàn bài là hai khái niệm khác nhau.
+```js
+new Answer({
+  id: "a1",
+  text: "Paris"
+});
+```
+
+### Question
+
+Đại diện cho một câu hỏi cùng các đáp án và đáp án đúng.
+
+```js
+new Question({
+  id: "q1",
+  text: "What is the capital of France?",
+  answers: [
+    { id: "a1", text: "Paris" },
+    { id: "a2", text: "London" }
+  ],
+  correct: ["a1"]
+});
+```
+
+### Result
+
+Đại diện cho kết quả đánh giá của một câu hỏi.
+
+Các trạng thái:
+
+```text
+correct
+incorrect
+unanswered
+```
+
+### Summary
+
+Tổng hợp các `Result`:
+
+```text
+total
+correct
+incorrect
+unanswered
+```
+
+### Score
+
+Tính điểm từ `Summary`:
+
+```text
+points
+percentage
+```
+
+## Processing Functions
+
+Examination cung cấp các tầng xử lý độc lập:
+
+```js
+normalize(input);
+validate(input);
+compare(question, actual);
+evaluate(question, actual);
+summarize(results);
+score(summary);
+```
+
+## Examination
+
+`Examination` cung cấp một interface thống nhất cho pipeline:
+
+```js
+const exam = new Examination();
+
+const result = exam.run(input, answers);
+```
+
+`run()` thực hiện:
+
+```text
+normalize
+   ↓
+validate
+   ↓
+evaluateCollection
+   ↓
+summary
+   ↓
+score
+```
+
+Kết quả:
+
+```js
+{
+  results,
+  summary,
+  score
+}
+```
+
+## Không thuộc Core
+
+Các trách nhiệm sau không thuộc Examination core hiện tại:
+
+* UI
+* DOM
+* React
+* Vue
+* rendering
+* navigation
+* timer
+* randomization
+* application state
+* session management
+* consumer settings
+
+Consumer có thể xây dựng các chức năng này bên ngoài Examination.
+
+## Design Principle
+
+> Examination xử lý dữ liệu và logic đánh giá. Consumer quyết định cách sử dụng và hiển thị dữ liệu đó.
